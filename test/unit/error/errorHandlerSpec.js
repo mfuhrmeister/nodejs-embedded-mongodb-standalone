@@ -13,7 +13,7 @@ describe('errorHandler', function () {
   });
 
   it('should throw a DownloadError', function () {
-    var thrownError = {statusCode: 401};
+    var thrownError = {message: 'any error', statusCode: 401};
     try {
       underTest.handleDownloadError(thrownError);
     } catch(err) {
@@ -21,13 +21,21 @@ describe('errorHandler', function () {
     }
   });
 
-
   it('should throw a WriteError', function () {
-    var thrownError = {statusCode: 500};
+    var thrownError = {message: 'any error', statusCode: 500};
     try {
       underTest.handleWriteError(thrownError);
     } catch(err) {
       expect(err).toEqual(jasmine.any(WriteError));
+    }
+  });
+
+  it('should throw original WriteError', function () {
+    var thrownError = new WriteError();
+    try {
+      underTest.handleDownloadError(thrownError);
+    } catch(err) {
+      expect(err).toBe(thrownError);
     }
   });
 })

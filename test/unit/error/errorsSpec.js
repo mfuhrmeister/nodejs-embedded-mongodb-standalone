@@ -31,12 +31,15 @@ describe('errors', function () {
 
     });
 
-    it('should be initialized appropriately', function () {
-      var expectedStatusCode = 500;
+    it('should be initialized with custom message and status code', function () {
+      var
+        expectedStatusCode = 500,
+        expectedMessage = 'any additional error message';
 
-      error = new errors.DownloadError(expectedStatusCode);
+      error = new errors.DownloadError(expectedMessage, expectedStatusCode);
 
       expect(error.statusCode).toBe(expectedStatusCode);
+      expect(error.message).toBe(expectedMessage);
     });
   });
 
@@ -64,12 +67,15 @@ describe('errors', function () {
 
     });
 
-    it('should be initialized appropriately', function () {
-      var expectedStatusCode = 503;
+    it('should be initialized with custom message and status code', function () {
+      var
+        expectedStatusCode = 500,
+        expectedMessage = 'any additional error message';
 
-      error = new errors.WriteError(expectedStatusCode);
+      error = new errors.WriteError(expectedMessage, expectedStatusCode);
 
       expect(error.statusCode).toBe(expectedStatusCode);
+      expect(error.message).toBe(expectedMessage);
     });
   });
 });
