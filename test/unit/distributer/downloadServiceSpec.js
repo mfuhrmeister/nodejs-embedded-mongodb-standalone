@@ -1,6 +1,7 @@
 'use strict';
 
 var
+  os = require('os'),
   rewire = require('rewire'),
   promise = require('bluebird'),
   sprintf = require('sprintf-js').sprintf;
@@ -13,15 +14,15 @@ describe('downloadServiceSpec', function () {
     errorHandlerMock,
     loggerMock,
 
+    DEFAULT_VERSION = 'DEFAULT_VERSION',
+    DEFAULT_DOWNLOAD_FOLDER_MESSAGE = 'DEFAULT_DOWNLOAD_FOLDER_MESSAGE',
     ANY_VALID_VERSION = 'ANY_VALID_VERSION',
     ANY_INVALID_VERSION = 'ANY_INVALID_VERSION',
     ANY_DOWNLOAD_DIR = 'ANY_DOWNLOAD_DIR',
     ANY_VALID_DATA = 'ANY_VALID_DATA',
     ANY_ERROR_MESSAGE = 'ANY_ERROR_MESSAGE',
     ANY_ERROR = new Error(ANY_ERROR_MESSAGE),
-    EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: ANY_DOWNLOAD_DIR},
-    LOG_MESSAGE = 'Download mongodb %s to %s',
-    EXPECTED_LOG_MESSAGE = sprintf(LOG_MESSAGE, ANY_VALID_VERSION, ANY_DOWNLOAD_DIR);
+    LOG_MESSAGE = 'Download mongodb %s to %s';
 
   beforeEach(function () {
     mongodbDownloadMock = jasmine.createSpy('mongodbDownload');
@@ -60,7 +61,23 @@ describe('downloadServiceSpec', function () {
       });
     });
 
+    it('should call mongodbDownload and log with default download directory', function (done) {
+      var
+        EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: os.tmpdir()},
+        EXPECTED_LOG_MESSAGE = sprintf(LOG_MESSAGE, ANY_VALID_VERSION, os.tmpdir());
+
+      underTest.download(ANY_VALID_VERSION).then(function () {
+        expect(mongodbDownloadMock).toHaveBeenCalledWith(EXPECTED_OPTIONS);
+        expect(loggerMock.info.calls.argsFor(0)[1]).toEqual(EXPECTED_LOG_MESSAGE);
+        done();
+      });
+    });
+
     it('should call mongodbDownload with download options', function (done) {
+      var
+        EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: ANY_DOWNLOAD_DIR},
+        EXPECTED_LOG_MESSAGE = sprintf(LOG_MESSAGE, ANY_VALID_VERSION, ANY_DOWNLOAD_DIR);
+
       underTest.download(ANY_VALID_VERSION, ANY_DOWNLOAD_DIR).then(function () {
         expect(mongodbDownloadMock).toHaveBeenCalledWith(EXPECTED_OPTIONS);
         expect(loggerMock.info.calls.argsFor(0)[1]).toEqual(EXPECTED_LOG_MESSAGE);
