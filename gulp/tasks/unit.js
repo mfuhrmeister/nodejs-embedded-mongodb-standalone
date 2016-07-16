@@ -1,3 +1,5 @@
+'use strict';
+
 var
   gulp = require('gulp'),
   gutil = require('gulp-util'),
@@ -20,7 +22,6 @@ var
     jsFiles: [config.paths.source + '/**/*.js'],
     unit_test: config.paths.test.unit + '/**/*'
   };
-
 
 gulp.task('_istanbul',function(){
   return gulp
