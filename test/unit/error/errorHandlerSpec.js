@@ -2,7 +2,8 @@
 
 var
   DownloadError = require('../../../lib/error/errors').DownloadError,
-  WriteError = require('../../../lib/error/errors').WriteError;
+  WriteError = require('../../../lib/error/errors').WriteError,
+  ExtractionError = require('../../../lib/error/errors').ExtractionError;
 
 describe('errorHandler', function () {
 
@@ -29,6 +30,16 @@ describe('errorHandler', function () {
       expect(err).toEqual(jasmine.any(WriteError));
     }
   });
+
+  it('should throw a ExtractionError', function () {
+    var thrownError = {message: 'any error', statusCode: 500};
+    try {
+      underTest.handleExtractionError(thrownError);
+    } catch(err) {
+      expect(err).toEqual(jasmine.any(ExtractionError));
+    }
+  });
+
 
   it('should throw original WriteError', function () {
     var thrownError = new WriteError();
