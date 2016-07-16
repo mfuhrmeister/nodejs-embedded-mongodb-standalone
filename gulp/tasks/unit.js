@@ -31,14 +31,14 @@ gulp.task('_istanbul',function(){
     .pipe(istanbul.hookRequire());
 });
 
-
-gulp.task('_unit',["_istanbul"], function () {
+gulp.task('_unit',['_istanbul'], function () {
   return gulp
     .src(gutil.env.test || SRC.unit_test)
     .pipe(jasmine({
       reporter: junitReporter,
       verbose: true,
-      includeStackTrace: true
+      includeStackTrace: false
     }))
+    .on('error', function() { process.exit(1); } )
     .pipe(istanbul.writeReports());
 });
