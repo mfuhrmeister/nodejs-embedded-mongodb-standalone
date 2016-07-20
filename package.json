@@ -24,7 +24,7 @@
     "lib"
   ],
   "scripts": {
-    "test": "gulp",
+    "test": "./node_modules/gulp/bin/gulp.js test",
     "start": "node ./lib/index.js"
   },
   "main": "lib/index.js",
