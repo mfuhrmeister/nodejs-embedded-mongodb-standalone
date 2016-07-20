@@ -15,8 +15,13 @@ var
     filePrefix: 'TEST-',
     useDotNotation: true
   },
+  terminalReporterOptions = {
+    verbosity: 3,
+    color: 'yellow'
+  },
 
   junitReporter = new jasmineReporters.JUnitXmlReporter(junitReporterOptions),
+  terminalReporter = new jasmineReporters.TerminalReporter(terminalReporterOptions),
 
   SRC = {
     jsFiles: [config.paths.source + '/**/*.js'],
@@ -36,7 +41,7 @@ gulp.task('_unit',['_istanbul'], function () {
   return gulp
     .src(gutil.env.test || SRC.unit_test)
     .pipe(jasmine({
-      reporter: junitReporter,
+      reporter: [terminalReporter,junitReporter],
       verbose: true,
       includeStackTrace: false
     }))
