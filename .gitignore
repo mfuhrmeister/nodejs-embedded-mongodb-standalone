@@ -32,3 +32,13 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
+
+# build files
+target
+mongodb-download
+
+# local files
+info.txt
+TODO.txt
+
+
