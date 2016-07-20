@@ -1,7 +1,7 @@
 {
-  "name": "nodejs-embedded-mongodb-standalone",
+  "name": "nems",
   "version": "0.0.1",
-  "description": "Promise based embedded mongodb library that downloads a appropriate mongodb and utilizes it as standalone.",
+  "description": "nodejs-embedded-mongodb-standalone is a promise based embedded mongodb distribution library that downloads a appropriate mongodb and utilizes it as standalone, e.g. fo integration/functional tests.",
   "homepage": "https://github.com/mfuhrmeister/nodejs-embedded-mongodb-standalone",
   "keywords": [
     "mongo",
