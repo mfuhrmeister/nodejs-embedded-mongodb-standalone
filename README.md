@@ -14,7 +14,8 @@ CircleCI: ![Circle CI build status](https://circleci.com/gh/mfuhrmeister/nodejs-
 ## Features (current)
 
 #### Distributer
-Downloads and extracts mongodb for a given version and download directory, or uses defaults.
+Downloads and extracts mongodb for a given version and download directory.
+The version is mandatory, the download directory may default to the OS temporary directory.
 
 ###### Usage:
 ```javascript
@@ -44,8 +45,11 @@ A sophisticated module interface to download, extract, start and stop a mongodb 
 ## Scripts
 Within this module use:
 
- - **npm test** : `./node_modules/gulp/bin/gulp.js test` runs jshint on gulp, test and source files and runs all tests with code coverage analysis.
  - **npm start** : `node bin/dax [version [directory]]` will download and extract mongodb for given version and download directory, otherwise uses defaults. Use only the 'h' flag to see further usage information.
+
+Within the source code project:
+
+ - **npm test** : `./node_modules/gulp/bin/gulp.js test` runs jshint on gulp, test and source files and runs all tests with code coverage analysis.
 
 ## Contributing
 
