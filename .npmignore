@@ -1,0 +1,19 @@
+# Dependency directory
+# https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
+node_modules
+
+# build files
+target
+mongodb-download
+
+# local dev folders and files
+.idea
+gulp
+gulpfile.js
+test
+coverage
+info.txt
+TODO.txt
+.gitignore
+.jshintrc
+.npmignore
