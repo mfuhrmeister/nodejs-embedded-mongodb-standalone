@@ -45,7 +45,7 @@ A sophisticated module interface to download, extract, start and stop a mongodb 
 ## Scripts
 Within this module use:
 
- - **npm start** : `node bin/dax [version [directory]]` will download and extract mongodb for given version and download directory, otherwise uses defaults. Use only the 'h' flag to see further usage information.
+ - **npm start** : `node bin/dax [version [directory]]` will download and extract mongodb for given version and download directory, otherwise uses defaults (version 2.4.9 and OS temp folder). Use only the 'h' flag to see further usage information.
 
 Within the source code project:
 
