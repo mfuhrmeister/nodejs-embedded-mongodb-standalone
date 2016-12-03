@@ -1,7 +1,6 @@
 'use strict';
 var
   gulp = require('gulp'),
-  path = require('path'),
   sequence = require('run-sequence'),
   requireDir = require('require-dir');
 
@@ -48,5 +47,7 @@ gulp.task('test', function(done) {
     done
   );
 });
+
+// release: build, spawn:gulp-release-easy, spawn:npm
 
 gulp.task('default', ['_watch']);
