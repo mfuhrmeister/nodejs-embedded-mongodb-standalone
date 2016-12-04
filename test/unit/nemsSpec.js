@@ -21,7 +21,7 @@ describe('index', function() {
     downloadServiceMock = jasmine.createSpyObj('downloadService', ['download']);
     downloadServiceMock.download.and.returnValue(promise.resolve(ANY_FILE));
 
-    extractionServiceMock = jasmine.createSpyObj('downloadService', ['extract']);
+    extractionServiceMock = jasmine.createSpyObj('extractionService', ['extract']);
     extractionServiceMock.extract.and.returnValue(promise.resolve(ANY_FILE));
 
 
