@@ -21,11 +21,9 @@
   },
   "license": "MIT",
   "files": [
-    "lib"
+    "lib",
+    "bin"
   ],
-  "bin": {
-    "dax": "bin/dax"
-  },
   "scripts": {
     "test": "./node_modules/gulp/bin/gulp.js test",
     "start": "node bin/dax"
