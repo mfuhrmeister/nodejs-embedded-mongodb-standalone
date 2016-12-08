@@ -1,5 +1,8 @@
 /** DAX - Download and extract mongodb with given version and extraction directory or defaults **/
 
+// toogle debug output for mongodb-download
+process.env.DEBUG = '*';
+
 var
   logger = require('npmlog'),
   sprintf = require('sprintf-js').sprintf,
