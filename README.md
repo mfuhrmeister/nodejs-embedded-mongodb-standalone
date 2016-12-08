@@ -24,9 +24,9 @@ var nems = require('nems');
 nems.distribute('3.2.8', '.')
     .then(function (files) {
       // do anything else with the 'files' array containing File objects
-    }.catch(err) {
+    }).catch(function(err) {
       // catch any DownloadError, ExtractionError or standard Error
-    };
+    });
 ```
 
 ## Features (comming with version 0.2.0)
