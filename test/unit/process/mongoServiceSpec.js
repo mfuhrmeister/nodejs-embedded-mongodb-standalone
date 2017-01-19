@@ -9,6 +9,7 @@ var
   PARAMETER_PORT = '--port',
   PARAMETER_NOPREALLOC = '--noprealloc',
   PARAMETER_NOJOURNAL = '--nojournal',
+  PARAMETER_SHUTDOWN = '--shutdown',
 
   ANY_DB_PATH = 'ANY_DB_PATH',
   ANY_PORT = 'ANY_PORT',
@@ -17,7 +18,9 @@ var
   ANY_ERROR = 'ANY_ERROR',
   ANY_MONGO_ERROR = 'ANY_MONGO_ERROR',
   ANY_MONGO_MESSAGE = 'ANY_MONGO_MESSAGE',
-  MONGO_WAITING = '[initandlisten] waiting for connections on port';
+  MONGO_WAITING = '[initandlisten] waiting for connections on port',
+  MONGO_IS_ABSENT = 'mongo process does not exist',
+  MONGO_SHUTDOWN_ERROR = 'could not create child process to stop mongo process';
 
 describe('mongoService', function () {
 
@@ -134,6 +137,64 @@ describe('mongoService', function () {
 
         stdoutEventEmitter.emit('message', ANY_MONGO_MESSAGE);
         stdoutEventEmitter.emit('data', MONGO_WAITING);
+      });
+    });
+  });
+
+  describe('stop', function() {
+
+    describe('child process execution', function () {
+
+      beforeEach(function(){
+        underTest.__set__('mongoProcess', true);
+      });
+
+      it('should reject when anything throws', function (done) {
+        childProcessMock.exec.and.throwError(ANY_ERROR);
+
+        underTest.stop().then(function () {
+          done.fail('reject when anything throws should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(new Error(ANY_ERROR));
+          done();
+        });
+      });
+
+      it('should reject when child process creation failed', function (done) {
+        childProcessMock.exec.and.returnValue(undefined);
+
+        underTest.stop().then(function () {
+          done.fail('reject when child process creation failed should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(new Error(MONGO_SHUTDOWN_ERROR));
+          done();
+        });
+      });
+
+      function testStopChildProcess(test) {
+        it('should call exec on child_process with command ' + test.command, function (done) {
+          underTest.stop.apply(this, test.params).then(function () {
+            expect(childProcessMock.exec.calls.argsFor(0)[0]).toEqual(test.command);
+            done()
+          }).catch(function () {
+            done.fail('exec child process with command ' + test.command + ' should have been resolved');
+          });
+        });
+      }
+
+      [
+        {params: null, command: [MONGOD_COMMAND, PARAMETER_SHUTDOWN].join(' ')},
+        {params: [ANY_DB_PATH], command: [MONGOD_COMMAND, PARAMETER_SHUTDOWN, PARAMETER_DBPATH, ANY_DB_PATH].join(' ')}
+      ].forEach(testStopChildProcess);
+
+    });
+
+    it('should resolve with info if mongo process is absent', function (done) {
+      underTest.stop().then(function (data) {
+        expect(data).toEqual(MONGO_IS_ABSENT);
+        done();
+      }).catch(function () {
+        done.fail('resolve with info if mongo process is absent should have been resolved');
       });
     });
   });
