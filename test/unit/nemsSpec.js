@@ -61,4 +61,36 @@ describe('index', function() {
     testDownload(value);
   });
 
+
+  describe('extract', function() {
+
+    it('should call extract', function (done) {
+      underTest.extract(ANY_FILE, ANY_VERSION, ANY_DOWNLOAD_DIR).then(function (files) {
+        expect(extractionServiceMock.extract).toHaveBeenCalledWith(ANY_FILE, ANY_VERSION, ANY_DOWNLOAD_DIR);
+        expect(files).toEqual(ANY_FILE);
+        done();
+      });
+    });
+  });
+
+  function testExtractionError(value) {
+    describe(value, function() {
+      it('should reject a promise if extraction fails', function (done) {
+        var expectedError = new Error('any extraction error');
+        extractionServiceMock.extract.and.returnValue(promise.reject(expectedError));
+
+        underTest[value]().then(function () {
+          done.fail('Error should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(expectedError);
+          done();
+        });
+      });
+    });
+  }
+
+  ['distribute', 'extract'].forEach(function(value) {
+    testExtractionError(value);
+  });
+
 });
