@@ -52,8 +52,35 @@ nems.extract('/path/to/file.gz', '3.2.8', '.')
 #### Process
 Start or stop a mongodb for the given file path.
 
+###### Usage:
+```javascript
+var nems = require('nems');
+
+/**
+ * Parameter: 
+ *  path - path to the mongodb installation
+ *  port - the mongodb port (optional)
+ *  noprealloc - do not pre-allocate (optional)
+ *  nojournal - do not use a journal (optional)
+ * 
+ */
+nems.startMongo('path/to/mongodb', 27017, true, true)
+    .then(function (pid) {
+      // do anything with the returned process id
+    }.catch(err) {
+      // catch any standard Error, e.g. if child process to start mongo crashed
+    };
+    
+nems.stopMongo('/path/to/mongodb')
+    .then(function (message) {
+      // message may be 'mongo process does not exist'
+    }.catch(err) {
+      // catch any standard Error, e.g. if child process to stop mongo crashed
+    };
+```
+
 #### Interface
-A sophisticated module interface to download, extract, start and stop a mongodb at once or use all of them independently.
+A sophisticated module interface to download, extract, start and stop a mongodb at once.
 
 ## Install
 
