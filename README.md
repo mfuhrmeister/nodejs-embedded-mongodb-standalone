@@ -28,8 +28,26 @@ nems.distribute('3.2.8', '.')
       // catch any DownloadError, ExtractionError or standard Error
     });
 ```
+You can use the download and extraction service separately:
 
-## Features (comming with version 0.2.0)
+###### Usage:
+```javascript
+var nems = require('nems');
+
+nems.download('3.2.8', '.')
+    .then(function (file) {
+      // do anything else with the 'file' string
+    }.catch(err) {
+      // catch any DownloadError or standard Error
+    };
+    
+nems.extract('/path/to/file.gz', '3.2.8', '.')
+    .then(function (file) {
+      // do anything else with the 'files' array containing File objects
+    }.catch(err) {
+      // catch any ExtractionError or standard Error
+    };
+```
 
 #### Process
 Start or stop a mongodb for the given file path.
