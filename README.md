@@ -50,7 +50,7 @@ nems.extract('/path/to/file.gz', '3.2.8', '.')
 ```
 
 #### Process
-Start or stop a mongodb for the given file path.
+Start a mongodb for the given file path.
 
 ###### Usage:
 ```javascript
@@ -70,17 +70,43 @@ nems.startMongo('path/to/mongodb', 27017, true, true)
     }.catch(err) {
       // catch any standard Error, e.g. if child process to start mongo crashed
     };
-    
-nems.stopMongo('/path/to/mongodb')
-    .then(function (message) {
-      // message may be 'mongo process does not exist'
-    }.catch(err) {
-      // catch any standard Error, e.g. if child process to stop mongo crashed
-    };
 ```
 
 #### Interface
-A sophisticated module interface to download, extract, start and stop a mongodb at once.
+A sophisticated module interface to download, extract and start a mongodb at once, as well as stopping it.
+
+###### Usage:
+```javascript
+var nems = require('nems');
+
+/**
+ * Parameter: 
+ *  version - the desired mongodb version
+ *  path - path to the mongodb installation
+ *  port - the mongodb port (optional)
+ *  downloadDir - the directory to download and extract to (optional, defaults to the OS temporary directory)
+ *  noprealloc - do not pre-allocate (optional)
+ *  nojournal - do not use a journal (optional)
+ * 
+ */
+nems.start('3.2.8','path/to/mongodb', '.', 27017, true, true)
+    .then(function (pid) {
+      // do anything with the returned process id
+    }.catch(err) {
+      // catch any standard Error, e.g. if child process to start mongo crashed
+    };
+    
+/**
+ * Parameter: 
+ *  path - path to the mongodb installation
+ */
+nems.stop('path/to/mongodb')
+    .then(function () {
+      // do anything after mongodb shutdown
+    }.catch(err) {
+      // catch any standard Error, e.g. if child process to start mongo crashed
+    };
+```
 
 ## Install
 
