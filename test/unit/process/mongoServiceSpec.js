@@ -71,7 +71,7 @@ describe('mongoService', function () {
         it('should call exec on child_process with command ' + test.command, function (done) {
           underTest.start.apply(this, test.params).then(function () {
             expect(childProcessMock.exec.calls.argsFor(0)[0]).toEqual(test.command);
-            done()
+            done();
           }).catch(function () {
             done.fail('exec child process with command ' + test.command + ' should have been resolved');
           });
@@ -175,7 +175,7 @@ describe('mongoService', function () {
         it('should call exec on child_process with command ' + test.command, function (done) {
           underTest.stop.apply(this, test.params).then(function () {
             expect(childProcessMock.exec.calls.argsFor(0)[0]).toEqual(test.command);
-            done()
+            done();
           }).catch(function () {
             done.fail('exec child process with command ' + test.command + ' should have been resolved');
           });
