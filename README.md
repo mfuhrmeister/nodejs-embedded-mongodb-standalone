@@ -11,7 +11,7 @@ nodejs-embedded-mongodb-standalone is a promise based embedded mongodb distribut
 
 CircleCI: ![Circle CI build status](https://circleci.com/gh/mfuhrmeister/nodejs-embedded-mongodb-standalone.svg?style=svg)
 
-## Features (current)
+## Features
 
 #### Distributer
 Downloads and extracts mongodb for a given version and download directory.
