@@ -29,7 +29,7 @@ describe('downloadServiceSpec', function () {
     mongodbDownloadMock.and.returnValue(promise.resolve(ANY_VALID_DATA));
 
     errorHandlerMock = jasmine.createSpyObj('errorHandlerMock', ['handleDownloadError']);
-    errorHandlerMock.handleDownloadError.and.throwError(ANY_ERROR_MESSAGE);
+    errorHandlerMock.handleDownloadError.and.callFake(function(err) { throw err;});
 
     loggerMock = jasmine.createSpyObj('logger', ['info']);
 
@@ -56,6 +56,7 @@ describe('downloadServiceSpec', function () {
       underTest.download().then(function () {
         done.fail('Error should have been caught');
       }).catch(function (err) {
+        expect(errorHandlerMock.handleDownloadError).toHaveBeenCalledWith(ANY_ERROR);
         expect(err).toEqual(ANY_ERROR);
         done();
       });
