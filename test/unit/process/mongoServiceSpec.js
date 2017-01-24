@@ -19,6 +19,7 @@ var
   ANY_MONGO_ERROR = 'ANY_MONGO_ERROR',
   ANY_MONGO_MESSAGE = 'ANY_MONGO_MESSAGE',
   MONGO_WAITING = '[initandlisten] waiting for connections on port',
+  MONGO_START_FAILED = 'could not start mongo process: ',
   MONGO_IS_ABSENT = 'mongo process does not exist',
   MONGO_SHUTDOWN_ERROR = 'could not create child process to stop mongo process';
 
@@ -104,14 +105,16 @@ describe('mongoService', function () {
       });
 
       it('should reject on error in mongo process', function (done) {
+        var ANY_ROOT_CAUSE_MESSAGE = 'any error';
+
         underTest.start().then(function () {
           done.fail('reject on error in mongo process should have been caught');
         }).catch(function (err) {
-          expect(err).toEqual(new Error(ANY_MONGO_ERROR));
+          expect(err).toEqual(new Error(MONGO_START_FAILED + ANY_ROOT_CAUSE_MESSAGE));
           done();
         });
 
-        stderrEventEmitter.emit('data', ANY_MONGO_ERROR);
+        stderrEventEmitter.emit('data', ANY_ROOT_CAUSE_MESSAGE);
       });
 
       it('should resolve with info if mongo process has started', function (done) {

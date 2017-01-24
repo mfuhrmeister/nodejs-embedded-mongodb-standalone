@@ -13,7 +13,7 @@ describe('errors', function () {
       var error;
 
       beforeEach(function() {
-        error = new errors[expectedErrorObject.name]();
+        error = new errors[expectedErrorObject.name](expectedErrorObject.message);
       });
 
       describe('properties', function() {
@@ -65,6 +65,11 @@ describe('errors', function () {
     {
       name : 'ExtractionError',
       message: 'Extracting file went wrong!',
+      statusCode: 500
+    },
+    {
+      name : 'MongoError',
+      message: 'Starting mongo process went wrong!',
       statusCode: 500
     }
   ];
