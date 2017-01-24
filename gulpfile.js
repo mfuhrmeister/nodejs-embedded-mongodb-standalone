@@ -48,6 +48,4 @@ gulp.task('test', function(done) {
   );
 });
 
-// release: build, spawn:gulp-release-easy, spawn:npm
-
 gulp.task('default', ['_watch']);
