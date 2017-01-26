@@ -18,8 +18,7 @@ var
     'If no download directory is given, mongodb will be downloaded and extracted to the temporary folder of your OS.\n' +
     'If no version is given also, a default version will be downloaded and extracted.',
   MESSAGE_DEFAULTS = 'Using default configuration for download and extraction.',
-  MESSAGE_FAILURE = 'Download or extraction failed. No file information returned from extraction',
-  MESSAGE_EXTRACTED = 'Extracted %s files to %s.',
+  MESSAGE_EXTRACTED = 'Extracted to %s .',
   MESSAGE_SUCCESS = 'Download and extraction completed.';
 
 
@@ -37,11 +36,7 @@ var
   DOWNLOAD_DIR = args[1];
 
 nems.distribute(VERSION, DOWNLOAD_DIR)
-  .then(function(files) {
-    if (!files || files.length === 0) {
-      logger.info(MODULE_NAME, MESSAGE_FAILURE);
-      return;
-    }
-    logger.info(MODULE_NAME, sprintf(MESSAGE_EXTRACTED, files.length, files[0]['base']));
+  .then(function(path) {
+    logger.info(MODULE_NAME, sprintf(MESSAGE_EXTRACTED, path));
     logger.info(MODULE_NAME, MESSAGE_SUCCESS);
   });

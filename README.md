@@ -22,8 +22,8 @@ The version is mandatory, the download directory may default to the OS temporary
 var nems = require('nems');
 
 nems.distribute('3.2.8', '.')
-    .then(function (files) {
-      // do anything else with the 'files' array containing File objects
+    .then(function (path) {
+      // do anything else with the 'path' to the extracted mongo directory
     }).catch(function(err) {
       // catch any DownloadError, ExtractionError or standard Error
     });
@@ -42,8 +42,8 @@ nems.download('3.2.8', '.')
     };
     
 nems.extract('/path/to/file.gz', '3.2.8', '.')
-    .then(function (file) {
-      // do anything else with the 'files' array containing File objects
+    .then(function (path) {
+      // do anything else with the 'path' to the extracted mongo directory
     }.catch(err) {
       // catch any ExtractionError or standard Error
     };
@@ -82,14 +82,13 @@ var nems = require('nems');
 /**
  * Parameter: 
  *  version - the desired mongodb version
- *  path - path to the mongodb installation
- *  port - the mongodb port (optional)
  *  downloadDir - the directory to download and extract to (optional, defaults to the OS temporary directory)
+ *  port - the mongodb port (optional)
  *  noprealloc - do not pre-allocate (optional)
  *  nojournal - do not use a journal (optional)
  * 
  */
-nems.start('3.2.8','path/to/mongodb', '.', 27017, true, true)
+nems.start('3.2.8', '.', 27017, true, true)
     .then(function (pid) {
       // do anything with the returned process id
     }.catch(err) {

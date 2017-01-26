@@ -102,10 +102,10 @@ describe('extractionService', function () {
 
     it('should call "dest" with default extraction directory', function (done) {
       var
-        EXPECTED_EXTRACTION_PATH = [os.tmpdir(), ANY_EXTRACTION_DIR, ANY_VALID_VERSION].join('/');
+        expectedExtractionPath = [os.tmpdir(), ANY_EXTRACTION_DIR, ANY_VALID_VERSION].join('/');
 
       underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION).then(function () {
-        expect(decompressMock.dest).toHaveBeenCalledWith(EXPECTED_EXTRACTION_PATH);
+        expect(decompressMock.dest).toHaveBeenCalledWith(expectedExtractionPath);
         done();
       });
     });
@@ -125,7 +125,7 @@ describe('extractionService', function () {
         expectedError = new Error(ANY_ARCH_TYPE_ERROR_MESSAGE),
         file = [ANY_VALID_FILE_PATH, ANY_INVALID_ARCH_TYPE].join('.');
 
-      underTest.extract(file, ANY_VALID_VERSION, ANY_EXTRACTION_DIR).then(function () {
+      underTest.extract(file, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
         done.fail('Error should have been caught');
       }).catch(function (err) {
         expect(err).toEqual(expectedError);
@@ -138,7 +138,7 @@ describe('extractionService', function () {
         var
           file = [ANY_VALID_FILE_PATH, archTypeObject.arch].join('.');
 
-        underTest.extract(file, ANY_VALID_VERSION, ANY_EXTRACTION_DIR).then(function () {
+        underTest.extract(file, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
           expect(decompressMock[archTypeObject.expectedFunction]).toHaveBeenCalledWith(DECOMPRESS_ARCH_OPTIONS);
           done();
         });
@@ -173,14 +173,14 @@ describe('extractionService', function () {
     ].forEach(testDecompressArch);
 
     it('should call "use" with decompress arch type', function (done) {
-      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_DIR).then(function () {
+      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
         expect(decompressMock.use).toHaveBeenCalledWith(DECOMPRESS_ARCH_PLUGIN);
         done();
       });
     });
 
     it('should call "run" with callback function', function (done) {
-      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_DIR).then(function () {
+      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
         expect(decompressMock.run).toHaveBeenCalledWith(jasmine.any(Function));
         done();
       });
@@ -192,7 +192,7 @@ describe('extractionService', function () {
         cb(expectedError);
       });
 
-      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_DIR).then(function () {
+      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
         done.fail('Error should have been caught');
       }).catch(function (err) {
         expect(err).toEqual(expectedError);
@@ -200,15 +200,16 @@ describe('extractionService', function () {
       });
     });
 
-    it('should resolve with files', function (done) {
-      var expectedFiles = 'any expected files';
+    it('should resolve with extraction directory', function (done) {
+      var
+        expectedExtractionPath = [ANY_EXTRACTION_BASE_DIR, ANY_EXTRACTION_DIR, ANY_VALID_VERSION].join('/');
 
       decompressMock.run.and.callFake(function (cb) {
-        cb(null, expectedFiles);
+        cb(null, null);
       });
 
-      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_DIR).then(function (files) {
-        expect(files).toEqual(expectedFiles);
+      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function (path) {
+        expect(path).toEqual(expectedExtractionPath);
         done();
       });
     });

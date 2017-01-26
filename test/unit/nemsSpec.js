@@ -26,7 +26,7 @@ describe('index', function () {
     downloadServiceMock.download.and.returnValue(promise.resolve(ANY_FILE));
 
     extractionServiceMock = jasmine.createSpyObj('extractionService', ['extract']);
-    extractionServiceMock.extract.and.returnValue(promise.resolve(ANY_FILE));
+    extractionServiceMock.extract.and.returnValue(promise.resolve(ANY_DOWNLOAD_DIR));
 
     mongoServiceMock = jasmine.createSpyObj('mongoService', ['start', 'stop']);
     mongoServiceMock.start.and.returnValue(promise.resolve(ANY_PID));
@@ -72,9 +72,9 @@ describe('index', function () {
   describe('extract', function () {
 
     it('should call extract', function (done) {
-      underTest.extract(ANY_FILE, ANY_VERSION, ANY_DOWNLOAD_DIR).then(function (files) {
+      underTest.extract(ANY_FILE, ANY_VERSION, ANY_DOWNLOAD_DIR).then(function (path) {
         expect(extractionServiceMock.extract).toHaveBeenCalledWith(ANY_FILE, ANY_VERSION, ANY_DOWNLOAD_DIR);
-        expect(files).toEqual(ANY_FILE);
+        expect(path).toEqual(ANY_DOWNLOAD_DIR);
         done();
       });
     });
@@ -135,10 +135,12 @@ describe('index', function () {
     });
 
     it('should call all services and return the process id', function (done) {
-      underTest.start(ANY_VERSION, ANY_DB_PATH, ANY_DOWNLOAD_DIR, ANY_PORT, true, true).then(function (pid) {
+      var expectedDbPath = ANY_DOWNLOAD_DIR + '/bin';
+
+      underTest.start(ANY_VERSION, ANY_DOWNLOAD_DIR, ANY_PORT, true, true).then(function (pid) {
         expect(downloadServiceMock.download).toHaveBeenCalledWith(ANY_VERSION, ANY_DOWNLOAD_DIR);
         expect(extractionServiceMock.extract).toHaveBeenCalledWith(ANY_FILE, ANY_VERSION, ANY_DOWNLOAD_DIR);
-        expect(mongoServiceMock.start).toHaveBeenCalledWith(ANY_DB_PATH, ANY_PORT, true, true);
+        expect(mongoServiceMock.start).toHaveBeenCalledWith(expectedDbPath, ANY_PORT, true, true);
         expect(pid).toEqual(ANY_PID);
         done();
       }).catch(function () {
