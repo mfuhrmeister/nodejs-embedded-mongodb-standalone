@@ -206,14 +206,5 @@ describe('mongoService', function () {
       ].forEach(testStopChildProcess);
 
     });
-
-    it('should resolve with info if mongo process is absent', function (done) {
-      underTest.stop().then(function (data) {
-        expect(data).toEqual(ERROR_MESSAGE_MONGO_IS_ABSENT);
-        done();
-      }).catch(function () {
-        done.fail('resolve with info if mongo process is absent should have been resolved');
-      });
-    });
   });
 });
