@@ -129,7 +129,7 @@ describe('mongoService', function () {
           done();
         });
 
-        stderrEventEmitter.emit('data', MESSAGE_MONGO_INIT_EXCEPTION);
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_INIT_EXCEPTION);
       });
 
       it('should resolve with info if mongo process has started', function (done) {
