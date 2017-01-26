@@ -22,7 +22,6 @@ var
   MESSAGE_MONGO_INIT_EXCEPTION = '[initandlisten] exception in initAndListen',
 
   ERROR_MESSAGE_MONGO_START_FAILED = 'could not start mongo process: ',
-  ERROR_MESSAGE_MONGO_IS_ABSENT = 'mongo process does not exist',
   ERROR_MESSAGE_MONGO_SHUTDOWN = 'could not create child process to stop mongo process',
   ERROR_MESSAGE_MONGO_INSTANCE_EXIST = 'Is a mongod instance already running?';
 
