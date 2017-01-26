@@ -18,10 +18,13 @@ var
   ANY_ERROR = 'ANY_ERROR',
   ANY_MONGO_ERROR = 'ANY_MONGO_ERROR',
   ANY_MONGO_MESSAGE = 'ANY_MONGO_MESSAGE',
-  MONGO_WAITING = '[initandlisten] waiting for connections on port',
-  MONGO_START_FAILED = 'could not start mongo process: ',
-  MONGO_IS_ABSENT = 'mongo process does not exist',
-  MONGO_SHUTDOWN_ERROR = 'could not create child process to stop mongo process';
+  MESSAGE_MONGO_WAITING = '[initandlisten] waiting for connections on port',
+  MESSAGE_MONGO_INIT_EXCEPTION = '[initandlisten] exception in initAndListen',
+
+  ERROR_MESSAGE_MONGO_START_FAILED = 'could not start mongo process: ',
+  ERROR_MESSAGE_MONGO_IS_ABSENT = 'mongo process does not exist',
+  ERROR_MESSAGE_MONGO_SHUTDOWN = 'could not create child process to stop mongo process',
+  ERROR_MESSAGE_MONGO_INSTANCE_EXIST = 'Is a mongod instance already running?';
 
 describe('mongoService', function () {
 
@@ -78,7 +81,7 @@ describe('mongoService', function () {
           });
 
           underTest.__set__('mongoProcess', {pid: ANY_PID});
-          stdoutEventEmitter.emit('data', MONGO_WAITING);
+          stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
         });
       }
 
@@ -110,11 +113,23 @@ describe('mongoService', function () {
         underTest.start().then(function () {
           done.fail('reject on error in mongo process should have been caught');
         }).catch(function (err) {
-          expect(err).toEqual(new Error(MONGO_START_FAILED + ANY_ROOT_CAUSE_MESSAGE));
+          expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_START_FAILED + ANY_ROOT_CAUSE_MESSAGE));
           done();
         });
 
         stderrEventEmitter.emit('data', ANY_ROOT_CAUSE_MESSAGE);
+      });
+
+      it('should reject on mongo may be already started', function (done) {
+
+        underTest.start().then(function () {
+          done.fail('reject on error in mongo process should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_START_FAILED + ERROR_MESSAGE_MONGO_INSTANCE_EXIST));
+          done();
+        });
+
+        stderrEventEmitter.emit('data', MESSAGE_MONGO_INIT_EXCEPTION);
       });
 
       it('should resolve with info if mongo process has started', function (done) {
@@ -127,7 +142,7 @@ describe('mongoService', function () {
         });
 
         underTest.__set__('mongoProcess', {pid: ANY_PID});
-        stdoutEventEmitter.emit('data', MONGO_WAITING);
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
       });
 
       it('should log mongo process messages', function (done) {
@@ -139,7 +154,7 @@ describe('mongoService', function () {
         });
 
         stdoutEventEmitter.emit('message', ANY_MONGO_MESSAGE);
-        stdoutEventEmitter.emit('data', MONGO_WAITING);
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
       });
     });
   });
@@ -169,7 +184,7 @@ describe('mongoService', function () {
         underTest.stop().then(function () {
           done.fail('reject when child process creation failed should have been caught');
         }).catch(function (err) {
-          expect(err).toEqual(new Error(MONGO_SHUTDOWN_ERROR));
+          expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_SHUTDOWN));
           done();
         });
       });
@@ -194,7 +209,7 @@ describe('mongoService', function () {
 
     it('should resolve with info if mongo process is absent', function (done) {
       underTest.stop().then(function (data) {
-        expect(data).toEqual(MONGO_IS_ABSENT);
+        expect(data).toEqual(ERROR_MESSAGE_MONGO_IS_ABSENT);
         done();
       }).catch(function () {
         done.fail('resolve with info if mongo process is absent should have been resolved');
