@@ -23,7 +23,7 @@ var
 
 
 if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
-  logger.warn(MODULE_NAME, MESSAGE_USAGE);
+  logger.info(MODULE_NAME, MESSAGE_USAGE);
   return;
 } else if (args.length === 0) {
   logger.info(MODULE_NAME, MESSAGE_DEFAULTS);
@@ -39,4 +39,7 @@ nems.distribute(VERSION, DOWNLOAD_DIR)
   .then(function(path) {
     logger.info(MODULE_NAME, sprintf(MESSAGE_EXTRACTED, path));
     logger.info(MODULE_NAME, MESSAGE_SUCCESS);
+  })
+  .catch(function (err) {
+    logger.error(MODULE_NAME, err);
   });
