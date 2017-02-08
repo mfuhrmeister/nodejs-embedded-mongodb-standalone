@@ -21,11 +21,13 @@ var
   MESSAGE_MONGO_WAITING = '[initandlisten] waiting for connections on port',
   MESSAGE_MONGO_INIT_EXCEPTION = '[initandlisten] exception in initAndListen',
   MESSAGE_MONGO_BAD_PORT = 'bad --port number',
+  MESSAGE_MONGO_ADDR_IN_USE = 'addr already in use',
 
   ERROR_MESSAGE_MONGO_START_FAILED = 'could not start mongo process: ',
   ERROR_MESSAGE_MONGO_SHUTDOWN = 'could not create child process to stop mongo process',
   ERROR_MESSAGE_MONGO_INSTANCE_EXIST = 'Is a mongod instance already running?',
-  ERROR_MESSAGE_MONGO_BAD_PORT = 'The port you used is not allowed. See mongodb docs.';
+  ERROR_MESSAGE_MONGO_BAD_PORT = 'The port you used is not allowed. See mongodb docs.',
+  ERROR_MESSAGE_MONGO_ADDR_IN_USE  = 'The port you used is already in use.';
 
 describe('mongoService', function () {
 
@@ -143,6 +145,18 @@ describe('mongoService', function () {
         });
 
         stdoutEventEmitter.emit('data', MESSAGE_MONGO_BAD_PORT);
+      });
+
+      it('should reject on address already in use', function (done) {
+
+        underTest.start().then(function () {
+          done.fail('reject on address already in use should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_START_FAILED + ERROR_MESSAGE_MONGO_ADDR_IN_USE));
+          done();
+        });
+
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_ADDR_IN_USE);
       });
 
       it('should resolve with info if mongo process has started', function (done) {
