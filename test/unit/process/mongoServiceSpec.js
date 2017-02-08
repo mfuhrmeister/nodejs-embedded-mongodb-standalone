@@ -20,10 +20,12 @@ var
   ANY_MONGO_MESSAGE = 'ANY_MONGO_MESSAGE',
   MESSAGE_MONGO_WAITING = '[initandlisten] waiting for connections on port',
   MESSAGE_MONGO_INIT_EXCEPTION = '[initandlisten] exception in initAndListen',
+  MESSAGE_MONGO_BAD_PORT = 'bad --port number',
 
   ERROR_MESSAGE_MONGO_START_FAILED = 'could not start mongo process: ',
   ERROR_MESSAGE_MONGO_SHUTDOWN = 'could not create child process to stop mongo process',
-  ERROR_MESSAGE_MONGO_INSTANCE_EXIST = 'Is a mongod instance already running?';
+  ERROR_MESSAGE_MONGO_INSTANCE_EXIST = 'Is a mongod instance already running?',
+  ERROR_MESSAGE_MONGO_BAD_PORT = 'The port you used is not allowed. See mongodb docs.';
 
 describe('mongoService', function () {
 
@@ -122,13 +124,25 @@ describe('mongoService', function () {
       it('should reject on mongo may be already started', function (done) {
 
         underTest.start().then(function () {
-          done.fail('reject on error in mongo process should have been caught');
+          done.fail('reject on mongo may be already started should have been caught');
         }).catch(function (err) {
           expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_START_FAILED + ERROR_MESSAGE_MONGO_INSTANCE_EXIST));
           done();
         });
 
         stdoutEventEmitter.emit('data', MESSAGE_MONGO_INIT_EXCEPTION);
+      });
+
+      it('should reject on bad port number', function (done) {
+
+        underTest.start().then(function () {
+          done.fail('reject on bad port number should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_START_FAILED + ERROR_MESSAGE_MONGO_BAD_PORT));
+          done();
+        });
+
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_BAD_PORT);
       });
 
       it('should resolve with info if mongo process has started', function (done) {
