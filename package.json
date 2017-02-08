@@ -27,7 +27,8 @@
   "scripts": {
     "test": "./node_modules/gulp/bin/gulp.js test",
     "dax": "node bin/dax",
-    "start": "node bin/start"
+    "start": "node bin/start",
+    "stop": "node bin/stop"
   },
   "main": "lib/nems.js",
   "repository": {

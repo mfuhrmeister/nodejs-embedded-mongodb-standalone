@@ -118,7 +118,9 @@ Within this module use:
  - **npm start** : `node bin/start [version [directory [port [noprealloc [nojournal]]]]]` will download, extract and start a mongodb for given version and download directory.
  - **npm run dax** : `node bin/dax [version [directory]]` will download and extract mongodb for given version and download directory.
  
- If no parameters are given, defaults (version 2.4.9 and OS temp folder) are used.  
+ - **npm run stop** : `node bin/stop [dbpath]` will stop mongodb for given db path.
+ 
+ If no parameters are given, defaults (version 2.4.9 and OS temp folder, resp. dbpath) are used.  
  Use only the 'h' flag to see further usage information.  
  *HINT: use double-minus to pass parameters to npm run command, e.g `npm start -- version`*
 
