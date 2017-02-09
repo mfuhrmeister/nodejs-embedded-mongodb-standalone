@@ -19,15 +19,20 @@ var
   ANY_MONGO_ERROR = 'ANY_MONGO_ERROR',
   ANY_MONGO_MESSAGE = 'ANY_MONGO_MESSAGE',
   MESSAGE_MONGO_WAITING = '[initandlisten] waiting for connections on port',
+  MESSAGE_MONGO_KILLING_PROCESS = 'killing process with pid',
   MESSAGE_MONGO_INIT_EXCEPTION = '[initandlisten] exception in initAndListen',
   MESSAGE_MONGO_BAD_PORT = 'bad --port number',
   MESSAGE_MONGO_ADDR_IN_USE = 'addr already in use',
+  MESSAGE_MONGO_UNKNOWN_DB_PATH = 'There doesn\'t seem to be a server running with dbpath',
+
+  SUCESS_MESSAGE_MONGO_SHUTDOWN = 'The mongodb instance has been shutdown!',
 
   ERROR_MESSAGE_MONGO_START_FAILED = 'could not start mongo process: ',
   ERROR_MESSAGE_MONGO_SHUTDOWN = 'could not create child process to stop mongo process',
   ERROR_MESSAGE_MONGO_INSTANCE_EXIST = 'Is a mongod instance already running?',
   ERROR_MESSAGE_MONGO_BAD_PORT = 'The port you used is not allowed. See mongodb docs.',
-  ERROR_MESSAGE_MONGO_ADDR_IN_USE  = 'The port you used is already in use.';
+  ERROR_MESSAGE_MONGO_ADDR_IN_USE  = 'The port you used is already in use.',
+  ERROR_MESSAGE_MONGO_UNKNOWN_DB_PATH = 'There doesn\'t seem to be a server running with the given dbpath.';
 
 describe('mongoService', function () {
 
@@ -216,6 +221,28 @@ describe('mongoService', function () {
         });
       });
 
+      it('should reject on unknown dbPath', function (done) {
+        underTest.stop().then(function () {
+          done.fail('reject on unknown dbPath should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_UNKNOWN_DB_PATH));
+          done();
+        });
+
+        stderrEventEmitter.emit('data', MESSAGE_MONGO_UNKNOWN_DB_PATH);
+      });
+
+      it('should resolve on shutdown', function (done) {
+        underTest.stop().then(function (message) {
+          expect(message).toEqual(SUCESS_MESSAGE_MONGO_SHUTDOWN);
+          done();
+        }).catch(function () {
+          done.fail('shutdown should have been resolved');
+        });
+
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
+      });
+
       function testStopChildProcess(test) {
         it('should call exec on child_process with command ' + test.command, function (done) {
           underTest.stop.apply(this, test.params).then(function () {
@@ -224,6 +251,8 @@ describe('mongoService', function () {
           }).catch(function () {
             done.fail('exec child process with command ' + test.command + ' should have been resolved');
           });
+
+          stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
         });
       }
 

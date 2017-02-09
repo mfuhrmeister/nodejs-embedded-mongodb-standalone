@@ -92,7 +92,7 @@ nems.start('3.2.8', '.', 27017, true, true)
     .then(function (pid) {
       // do anything with the returned process id
     }.catch(err) {
-      // catch any standard Error, e.g. if child process to start mongo crashed
+      // catch any MongoError or standard Error, e.g. if child process to start mongo crashed
     };
     
 /**
@@ -100,10 +100,10 @@ nems.start('3.2.8', '.', 27017, true, true)
  *  path - path to the mongodb installation
  */
 nems.stop('path/to/mongodb')
-    .then(function () {
+    .then(function (successMessage) {
       // do anything after mongodb shutdown
     }.catch(err) {
-      // catch any standard Error, e.g. if child process to start mongo crashed
+      // catch any MongoError or standard Error, e.g. if child process to start mongo crashed
     };
 ```
 
