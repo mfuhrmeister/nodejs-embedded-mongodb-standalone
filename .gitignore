@@ -38,7 +38,6 @@ target
 mongodb-download
 
 # local files
+.idea
 info.txt
 TODO.txt
-
-
