@@ -2,7 +2,6 @@
 
 var
   logger = require('npmlog'),
-  sprintf = require('sprintf-js').sprintf,
   args = process.argv.splice(process.execArgv.length + 2),
   
   nems = require('../lib/nems'),

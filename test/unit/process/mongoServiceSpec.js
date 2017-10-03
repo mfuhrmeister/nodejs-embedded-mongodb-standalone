@@ -3,6 +3,7 @@
 var
   rewire = require('rewire'),
   events = require('events'),
+  path = require('path'),
 
   MONGOD_COMMAND = 'mongod',
   PARAMETER_DBPATH = '--dbpath',
@@ -25,7 +26,7 @@ var
   MESSAGE_MONGO_ADDR_IN_USE = 'addr already in use',
   MESSAGE_MONGO_UNKNOWN_DB_PATH = 'There doesn\'t seem to be a server running with dbpath',
 
-  SUCESS_MESSAGE_MONGO_SHUTDOWN = 'The mongodb instance has been shutdown!',
+  SUCCESS_MESSAGE_MONGO_SHUTDOWN = 'The mongodb instance has been shutdown!',
 
   ERROR_MESSAGE_MONGO_START_FAILED = 'could not start mongo process: ',
   ERROR_MESSAGE_MONGO_SHUTDOWN = 'could not create child process to stop mongo process',
@@ -95,7 +96,8 @@ describe('mongoService', function () {
 
       [
         {params: null, command: MONGOD_COMMAND},
-        {params: [ANY_DB_PATH], command: [MONGOD_COMMAND, PARAMETER_DBPATH, ANY_DB_PATH].join(' ')},
+        { params: [ANY_DB_PATH],
+          command: [path.join(ANY_DB_PATH, MONGOD_COMMAND), PARAMETER_DBPATH, ANY_DB_PATH].join(' ')},
         {params: [null, ANY_PORT], command: [MONGOD_COMMAND, PARAMETER_PORT, ANY_PORT].join(' ')},
         {params: [null, null, true], command: [MONGOD_COMMAND, PARAMETER_NOPREALLOC].join(' ')},
         {params: [null, null, false, true], command: [MONGOD_COMMAND, PARAMETER_NOJOURNAL].join(' ')}
@@ -234,7 +236,7 @@ describe('mongoService', function () {
 
       it('should resolve on shutdown', function (done) {
         underTest.stop().then(function (message) {
-          expect(message).toEqual(SUCESS_MESSAGE_MONGO_SHUTDOWN);
+          expect(message).toEqual(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
           done();
         }).catch(function () {
           done.fail('shutdown should have been resolved');
@@ -258,7 +260,7 @@ describe('mongoService', function () {
 
       [
         {params: null, command: [MONGOD_COMMAND, PARAMETER_SHUTDOWN].join(' ')},
-        {params: [ANY_DB_PATH], command: [MONGOD_COMMAND, PARAMETER_SHUTDOWN, PARAMETER_DBPATH, ANY_DB_PATH].join(' ')}
+        {params: [ANY_DB_PATH], command: [path.join(ANY_DB_PATH, MONGOD_COMMAND), PARAMETER_SHUTDOWN, PARAMETER_DBPATH, ANY_DB_PATH].join(' ')}
       ].forEach(testStopChildProcess);
 
     });
