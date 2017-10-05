@@ -15,6 +15,5 @@
     "inject",
     "expect",
     "spyOn"
-  ],
-  "node": true
+  ]
 }
