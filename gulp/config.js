@@ -6,7 +6,8 @@ module.exports = {
     source: './lib',
     test: {
       base: './test',
-      unit: './test/unit'
+      unit: './test/unit',
+      functional: './test/functional'
     },
     reports: './target/test-reports'
   }

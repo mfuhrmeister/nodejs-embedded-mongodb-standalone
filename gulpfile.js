@@ -30,12 +30,20 @@ gulp.task('unit',function (done) {
   );
 });
 
+gulp.task('functional',function (done) {
+  sequence(
+    '_functional',
+    done
+  );
+});
+
 gulp.task('build',function(done) {
   sequence(
     '_clean',
     '_nsp',
     '_lint',
     '_unit',
+    '_functional',
     done
   );
 });
@@ -44,6 +52,7 @@ gulp.task('test', function(done) {
   sequence(
     '_lint',
     '_unit',
+    '_functional',
     done
   );
 });
