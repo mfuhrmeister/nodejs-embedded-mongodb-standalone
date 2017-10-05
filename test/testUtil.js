@@ -19,6 +19,11 @@ function killProcess(pid) {
   process.kill(pid, 'SIGTERM');
 }
 
+function escapePath(dbPath) {
+  return '"' + dbPath + '"';
+}
+
 module.exports.createFolder = mkdir;
 module.exports.deleteFolder = rm;
 module.exports.killProcess = killProcess;
+module.exports.escapePath = escapePath;

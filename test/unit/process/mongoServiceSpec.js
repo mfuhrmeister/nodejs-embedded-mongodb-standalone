@@ -4,6 +4,7 @@ var
   rewire = require('rewire'),
   events = require('events'),
   path = require('path'),
+  testUtil = require('../../testUtil.js'),
 
   MONGOD_COMMAND = 'mongod',
   PARAMETER_DBPATH = '--dbpath',
@@ -97,7 +98,11 @@ describe('mongoService', function () {
       [
         {params: null, command: MONGOD_COMMAND},
         { params: [ANY_DB_PATH],
-          command: [path.join(ANY_DB_PATH, MONGOD_COMMAND), PARAMETER_DBPATH, ANY_DB_PATH].join(' ')},
+          command: [
+            testUtil.escapePath(path.join(ANY_DB_PATH, MONGOD_COMMAND)),
+            PARAMETER_DBPATH,
+            testUtil.escapePath(ANY_DB_PATH)
+          ].join(' ')},
         {params: [null, ANY_PORT], command: [MONGOD_COMMAND, PARAMETER_PORT, ANY_PORT].join(' ')},
         {params: [null, null, true], command: [MONGOD_COMMAND, PARAMETER_NOPREALLOC].join(' ')},
         {params: [null, null, false, true], command: [MONGOD_COMMAND, PARAMETER_NOJOURNAL].join(' ')}
@@ -260,9 +265,16 @@ describe('mongoService', function () {
 
       [
         {params: null, command: [MONGOD_COMMAND, PARAMETER_SHUTDOWN].join(' ')},
-        {params: [ANY_DB_PATH], command: [path.join(ANY_DB_PATH, MONGOD_COMMAND), PARAMETER_SHUTDOWN, PARAMETER_DBPATH, ANY_DB_PATH].join(' ')}
+        {params: [ANY_DB_PATH],
+          command: [
+            testUtil.escapePath(path.join(ANY_DB_PATH, MONGOD_COMMAND)),
+            PARAMETER_DBPATH,
+            testUtil.escapePath(ANY_DB_PATH),
+            PARAMETER_SHUTDOWN
+          ].join(' ')}
       ].forEach(testStopChildProcess);
 
     });
   });
+
 });

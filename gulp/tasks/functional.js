@@ -33,8 +33,5 @@ gulp.task('_functional', function () {
       verbose: true,
       includeStackTrace: false
     }))
-    .on('error', function() { process.exit(1); } )
-    .on("end", function () {
-      console.log("We're done!");
-    });
+    .on('error', function() { process.exit(1); } );
 });
