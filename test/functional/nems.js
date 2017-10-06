@@ -25,7 +25,7 @@ describe('nems', function () {
   afterEach(function () {
     testUtil.deleteFolder(ANY_DB_PATH_WITH_SPACE);
 
-    testUtil.killProcess(PID);
+    testUtil.killProcess(PID, true);
 
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
   });
