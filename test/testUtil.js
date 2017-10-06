@@ -16,7 +16,7 @@ function rm(path) {
 }
 
 function killProcess(pid, hard) {
-  process.kill(pid, (!!hard) ? 'SIGKILL' : 'SIGTERM');
+  process.kill(pid, (!!hard) ? 'SIGKILL' : 'SIGHUB');
 }
 
 function escapePath(dbPath) {

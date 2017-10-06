@@ -22,7 +22,7 @@ describe('nems', function () {
   });
 
   afterEach(function () {
-    testUtil.killProcess(PID, true);
+    testUtil.killProcess(PID);
     testUtil.deleteFolder(ANY_DB_PATH_WITH_SPACE);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
   });
