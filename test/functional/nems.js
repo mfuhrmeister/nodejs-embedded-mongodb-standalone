@@ -16,17 +16,14 @@ describe('nems', function () {
   beforeEach(function () {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
-
     testUtil.createFolder(ANY_DB_PATH_WITH_SPACE);
 
     underTest = require('../../lib/nems.js');
   });
 
   afterEach(function () {
-    testUtil.deleteFolder(ANY_DB_PATH_WITH_SPACE);
-
     testUtil.killProcess(PID, true);
-
+    testUtil.deleteFolder(ANY_DB_PATH_WITH_SPACE);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
   });
 

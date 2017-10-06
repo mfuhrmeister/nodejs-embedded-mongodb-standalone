@@ -53,8 +53,19 @@ gulp.task('test', function(done) {
     '_lint',
     '_unit',
     '_functional',
-    done
+    gracefulShutdownFn(done)
   );
 });
 
 gulp.task('default', ['_watch']);
+
+
+function gracefulShutdownFn(done) {
+  return function() {
+    setTimeout(function() {
+      console.log('graceful shutdown');
+      process.kill(process.pid, 'SIGKILL');
+    }, 1000);
+    done();
+  };
+}
