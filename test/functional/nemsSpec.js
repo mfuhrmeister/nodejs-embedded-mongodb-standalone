@@ -10,7 +10,7 @@ var
 
   SUCCESS_MESSAGE_MONGO_SHUTDOWN = 'The mongodb instance has been shutdown!';
 
-describe('nems', function () {
+xdescribe('nems', function () {
 
   var
     underTest;
