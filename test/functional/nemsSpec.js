@@ -16,7 +16,7 @@ describe('nems', function () {
 
   beforeEach(function () {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
     testUtil.createFolder(ANY_DOWNLOAD_PATH_WITH_SPACE);
 
     underTest = require('../../lib/nems.js');
