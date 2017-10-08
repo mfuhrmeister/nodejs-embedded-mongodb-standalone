@@ -62,9 +62,10 @@ var nems = require('nems');
  *  port - the mongodb port (optional)
  *  noprealloc - do not pre-allocate (optional)
  *  nojournal - do not use a journal (optional)
+ *  dbpath - db working directory, if different from installation path (optional)
  * 
  */
-nems.startMongo('path/to/mongodb', 27017, true, true)
+nems.startMongo('path/to/mongodb/installation', 27017, true, true, 'path/to/db/working/directory')
     .then(function (pid) {
       // do anything with the returned process id
     }.catch(err) {
@@ -86,9 +87,10 @@ var nems = require('nems');
  *  port - the mongodb port (optional)
  *  noprealloc - do not pre-allocate (optional)
  *  nojournal - do not use a journal (optional)
+ *  dbpath - db working directory, if different from installation path (optional)
  * 
  */
-nems.start('3.2.8', '.', 27017, true, true)
+nems.start('3.2.8', '.', 27017, true, true, 'path/to/db/working/directory')
     .then(function (pid) {
       // do anything with the returned process id
     }.catch(err) {
@@ -98,8 +100,9 @@ nems.start('3.2.8', '.', 27017, true, true)
 /**
  * Parameter: 
  *  path - path to the mongodb installation
+ *  dbpath - db working directory, if different from installation path (optional)
  */
-nems.stop('path/to/mongodb')
+nems.stop('path/to/mongodb/installation','path/to/db/working/directory')
     .then(function (successMessage) {
       // do anything after mongodb shutdown
     }.catch(err) {
@@ -115,10 +118,10 @@ nems.stop('path/to/mongodb')
 ## Scripts
 Within this module use:
 
- - **npm start** : `node bin/start [version [directory [port [noprealloc [nojournal]]]]]` will download, extract and start a mongodb for given version and download directory.
+ - **npm start** : `node bin/start [version [directory [port [noprealloc [nojournal [dbpath]]]]]]` will download, extract and start a mongodb for given version, download directory and additional parameter.
  - **npm run dax** : `node bin/dax [version [directory]]` will download and extract mongodb for given version and download directory.
  
- - **npm run stop** : `node bin/stop [dbpath]` will stop mongodb for given db path.
+ - **npm run stop** : `node bin/stop [binPath [dbpath]]` will stop mongodb for given db installation path and/or working directory.
  
  If no parameters are given, defaults (version 2.4.9 and OS temp folder, resp. dbpath) are used.  
  Use only the 'h' flag to see further usage information.  

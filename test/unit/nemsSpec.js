@@ -14,6 +14,7 @@ describe('index', function () {
 
     ANY_VERSION = 'ANY_VERSION',
     ANY_DOWNLOAD_DIR = 'ANY_DOWNLOAD_DIR',
+    ANY_BIN_PATH = 'ANY_BIN_PATH',
     ANY_DB_PATH = 'ANY_DB_PATH',
     ANY_PORT = 'ANY_PORT',
     ANY_FILE = 'ANY_FILE',
@@ -114,8 +115,8 @@ describe('index', function () {
     });
 
     it('should call start of mongoService', function (done) {
-      underTest.startMongo(ANY_DB_PATH, ANY_PORT, true, true).then(function () {
-        expect(mongoServiceMock.start).toHaveBeenCalledWith(ANY_DB_PATH, ANY_PORT, true, true);
+      underTest.startMongo(ANY_BIN_PATH, ANY_PORT, true, true, ANY_DB_PATH).then(function () {
+        expect(mongoServiceMock.start).toHaveBeenCalledWith(ANY_BIN_PATH, ANY_PORT, true, true, ANY_DB_PATH);
         done();
       });
     });
@@ -135,12 +136,12 @@ describe('index', function () {
     });
 
     it('should call all services and return the process id', function (done) {
-      var expectedDbPath = ANY_DOWNLOAD_DIR + '/bin';
+      var expectedBinPath = ANY_DOWNLOAD_DIR + '/bin';
 
-      underTest.start(ANY_VERSION, ANY_DOWNLOAD_DIR, ANY_PORT, true, true).then(function (pid) {
+      underTest.start(ANY_VERSION, ANY_DOWNLOAD_DIR, ANY_PORT, true, true, ANY_DB_PATH).then(function (pid) {
         expect(downloadServiceMock.download).toHaveBeenCalledWith(ANY_VERSION, ANY_DOWNLOAD_DIR);
         expect(extractionServiceMock.extract).toHaveBeenCalledWith(ANY_FILE, ANY_VERSION, ANY_DOWNLOAD_DIR);
-        expect(mongoServiceMock.start).toHaveBeenCalledWith(expectedDbPath, ANY_PORT, true, true);
+        expect(mongoServiceMock.start).toHaveBeenCalledWith(expectedBinPath, ANY_PORT, true, true, ANY_DB_PATH);
         expect(pid).toEqual(ANY_PID);
         done();
       }).catch(function () {

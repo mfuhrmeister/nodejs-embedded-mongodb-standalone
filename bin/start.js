@@ -12,12 +12,13 @@ var
 
   MODULE_NAME = require('../package.json').name,
   MESSAGE_START = 'Starting distribution and execution of mongodb!',
-  MESSAGE_USAGE = 'Usage:\n\nnode ./bin/start.js [version [dir [port [noprealloc [nojournal]]]]]\n\n' +
+  MESSAGE_USAGE = 'Usage:\n\nnode ./bin/start.js [version [dir [port [noprealloc [nojournal [dbpath]]]]]]\n\n' +
     'version - the version of the mongodb\n' +
     'dir - the directory to download and extract to\n' +
     'port - the mongodb port (optional)\n' +
     'noprealloc - `true´ to not pre-allocate (optional)\n' +
     'nojournal - `true´ to not use a journal (optional)\n\n' +
+    'dbpath - db working directory, if different from installation path (optional)\n\n' +
     'DO NOT OMIT A PARAMETER IN SEQUENCE!\n' +
     'If no download directory is given, mongodb will be downloaded and extracted to the temporary folder of your OS.\n' +
     'If no version is given also, a default version will be downloaded and extracted.',
@@ -39,9 +40,10 @@ var
   DOWNLOAD_DIR = args[1],
   PORT = args[2],
   NOPREALLOC = args[3],
-  NOJOURNAL = args[4];
+  NOJOURNAL = args[4],
+  DB_PATH = args[5];
 
-nems.start(VERSION, DOWNLOAD_DIR, PORT, NOPREALLOC, NOJOURNAL)
+nems.start(VERSION, DOWNLOAD_DIR, PORT, NOPREALLOC, NOJOURNAL, DB_PATH)
   .then(function(pid) {
     logger.info(MODULE_NAME, sprintf(MESSAGE_STARTED, pid));
   })
