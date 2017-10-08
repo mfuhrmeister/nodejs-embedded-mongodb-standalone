@@ -24,7 +24,6 @@ describe('nems', function () {
   });
 
   afterEach(function () {
-    testUtil.deleteFolder(ANY_DOWNLOAD_PATH_WITH_SPACE);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
   });
 
