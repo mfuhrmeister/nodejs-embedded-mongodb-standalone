@@ -99,7 +99,11 @@ describe('mongoService', function () {
       [
         { params: null, command: MONGOD_COMMAND},
         { params: [ANY_BIN_PATH],
-          command: [testUtil.escapePath(path.join(ANY_BIN_PATH, MONGOD_COMMAND))].join(' ')
+          command: [
+            testUtil.escapePath(path.join(ANY_BIN_PATH, MONGOD_COMMAND)),
+            PARAMETER_DBPATH,
+            testUtil.escapePath(ANY_BIN_PATH)
+          ].join(' ')
         },
         { params: [null, ANY_PORT], command: [MONGOD_COMMAND, PARAMETER_PORT, ANY_PORT].join(' ')},
         { params: [null, null, true], command: [MONGOD_COMMAND, PARAMETER_NOPREALLOC].join(' ')},
@@ -257,6 +261,8 @@ describe('mongoService', function () {
         { params: [ANY_BIN_PATH],
           command: [
             testUtil.escapePath(path.join(ANY_BIN_PATH, MONGOD_COMMAND)),
+            PARAMETER_DBPATH,
+            testUtil.escapePath(ANY_BIN_PATH),
             PARAMETER_SHUTDOWN
           ].join(' ')},
         { params: [ANY_BIN_PATH, ANY_DB_PATH],
