@@ -7,9 +7,10 @@ var
   ANY_DOWNLOAD_PATH_WITH_SPACE = 'test folder',
   ANY_DB_PATH_WITH_SPACE = 'test folder',
 
-  PID;
 
-xdescribe('nems', function () {
+  SUCCESS_MESSAGE_MONGO_SHUTDOWN = 'The mongodb instance has been shutdown!';
+
+describe('nems', function () {
 
   var
     underTest;
@@ -23,7 +24,6 @@ xdescribe('nems', function () {
   });
 
   afterEach(function () {
-    testUtil.killProcess(PID);
     testUtil.deleteFolder(ANY_DOWNLOAD_PATH_WITH_SPACE);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
   });
@@ -33,12 +33,23 @@ xdescribe('nems', function () {
       underTest.start(ANY_VERSION, ANY_DOWNLOAD_PATH_WITH_SPACE, undefined, undefined, undefined, ANY_DB_PATH_WITH_SPACE)
         .then(function (pid) {
           expect(pid).toBeDefined();
-          PID = pid;
           done();
         }).catch(function (err) {
           console.log(err);
           done.fail('start with a space in the path to the bin folder should have been resolved');
         });
+    });
+  });
+
+  describe('stop', function () {
+    it('should stop a mongo with a space in the path to the bin folder', function (done) {
+      underTest.stop(ANY_DB_PATH_WITH_SPACE).then(function (message) {
+          expect(message).toBe(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
+          done();
+        }).catch(function (err) {
+        console.log(err);
+        done.fail('stop with a space in the path to the bin folder should have been resolved');
+      });
     });
   });
 });
