@@ -16,7 +16,7 @@ var
   MESSAGE_STOPPED = 'mongod stopped';
 
 
-if (args.length > 1 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
+if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
   logger.info(MODULE_NAME, MESSAGE_USAGE);
   return;
 } else if (args.length === 0) {
