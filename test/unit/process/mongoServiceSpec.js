@@ -184,18 +184,6 @@ describe('mongoService', function () {
         underTest.__set__('mongoProcess', {pid: ANY_PID});
         stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
       });
-
-      it('should log mongo process messages', function (done) {
-        underTest.start().then(function () {
-          expect(loggerMock.info.calls.argsFor(0)[1]).toEqual(ANY_MONGO_MESSAGE);
-          done();
-        }).catch(function () {
-          done.fail('resolve with info if mongo process has started should have been resolved');
-        });
-
-        stdoutEventEmitter.emit('message', ANY_MONGO_MESSAGE);
-        stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
-      });
     });
   });
 
