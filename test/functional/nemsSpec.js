@@ -9,7 +9,7 @@ var
 
   PID;
 
-describe('nems', function () {
+xdescribe('nems', function () {
 
   var
     underTest;
