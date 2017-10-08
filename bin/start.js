@@ -26,7 +26,7 @@ var
   MESSAGE_STARTED = 'mongod started with pid %s .';
 
 
-if (args.length > 5 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
+if (args.length > 6 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
   logger.info(MODULE_NAME, MESSAGE_USAGE);
   return;
 } else if (args.length === 0) {
