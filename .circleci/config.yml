@@ -1,13 +1,28 @@
-version: 2.0
+version: 2.1
+
 jobs:
   build:
     docker:
-      - image: circleci/node:latest
+      - image: cimg/node:10.24
+    working_directory: ~/project
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - npm-deps-v1-{{ checksum "package-lock.json" }}
+            - npm-deps-v1-
       - run:
-          name: npm install
-          command: npm i
+          name: Install dependencies
+          command: npm install
+      - save_cache:
+          key: npm-deps-v1-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
       - run:
-          name: gulp build
+          name: Build
           command: npm run build
+
+workflows:
+  build_and_test:
+    jobs:
+      - build
