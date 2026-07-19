@@ -40,7 +40,6 @@ gulp.task('functional',function (done) {
 gulp.task('build',function(done) {
   sequence(
     '_clean',
-    '_nsp',
     '_lint',
     '_unit',
     '_functional',

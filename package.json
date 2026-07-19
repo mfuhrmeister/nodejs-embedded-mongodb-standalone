@@ -43,7 +43,6 @@
     "gulp-istanbul": "^1.0.0",
     "gulp-jasmine": "^2.4.0",
     "gulp-jshint": "^2.0.1",
-    "gulp-nsp": "^2.1.0",
     "gulp-util": "^3.0.1",
     "jasmine-core": "^2.4.1",
     "jasmine-node": "^1.14.5",
@@ -56,11 +55,14 @@
     "run-sequence": "^1.2.1"
   },
   "dependencies": {
-    "bluebird": "^3.4.1",
-    "decompress": "^3.0.0",
+    "bluebird": "^3.7.2",
+    "decompress": "^4.2.1",
     "mongodb-download": "^1.3.2",
     "npmlog": "^4.0.0",
-    "ramda": "^0.22.1",
-    "sprintf-js": "^1.0.3"
+    "ramda": "^0.27.2",
+    "sprintf-js": "^1.1.3"
+  },
+  "overrides": {
+    "graceful-fs": "^4.2.11"
   }
 }

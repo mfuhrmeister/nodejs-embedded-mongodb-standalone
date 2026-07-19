@@ -3,10 +3,7 @@
 var
   os = require('os'),
   rewire = require('rewire'),
-
-  DECOMPRESS_MODE_OPTIONS = {mode: 755},
-  DECOMPRESS_ARCH_OPTIONS = {strip:1},
-  DECOMPRESS_ARCH_PLUGIN = 'DECOMPRESS_ARCH_PLUGIN',
+  Promise = require('bluebird'),
 
   ANY_VALID_FILE = 'ANY_VALID_FILE.zip',
   ANY_VALID_FILE_PATH = 'ANY_VALID_FILE_PATH',
@@ -19,19 +16,12 @@ var
   ANY_ARCH_TYPE_ERROR_MESSAGE = 'ANY_ARCH_TYPE_ERROR_MESSAGE';
 
 function createDecompressMock() {
-  var decompressMock = jasmine.createSpy('Decompress');
-  decompressMock.and.returnValue(decompressMock);
-  decompressMock.src = decompressMock.dest = decompressMock.use = jasmine.createSpy('decompressInstanceFunctions');
-  decompressMock.src.and.returnValue(decompressMock);
-  decompressMock.run = jasmine.createSpy('decompressInstanceFunctions');
-  decompressMock.run.and.callFake(function (cb) {
-    cb(null, ANY_VALID_FILE);
+  var decompressMock = jasmine.createSpy('Decompress').and.callFake(function (file, dest, options) {
+    return Promise.resolve([{ path: 'extracted_file' }]);
   });
-  decompressMock.zip = decompressMock.tar = decompressMock.targz = decompressMock.tarbz2 = jasmine.createSpy('decompressStaticFunctions');
-  decompressMock.zip.and.returnValue(DECOMPRESS_ARCH_PLUGIN);
-
   return decompressMock;
 }
+
 describe('extractionService', function () {
 
   var
@@ -86,36 +76,22 @@ describe('extractionService', function () {
 
   describe('decompress', function() {
 
-    it('should be called with file properties options', function (done) {
-      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION).then(function () {
-        expect(decompressMock).toHaveBeenCalledWith(DECOMPRESS_MODE_OPTIONS);
-        done();
-      });
-    });
-
-    it('should call "src" with file', function (done) {
-      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION).then(function () {
-        expect(decompressMock.src).toHaveBeenCalledWith(ANY_VALID_FILE);
-        done();
-      });
-    });
-
-    it('should call "dest" with default extraction directory', function (done) {
+    it('should call Decompress with default extraction directory and options', function (done) {
       var
         expectedExtractionPath = [os.tmpdir(), ANY_EXTRACTION_DIR, ANY_VALID_VERSION].join('/');
 
       underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION).then(function () {
-        expect(decompressMock.dest).toHaveBeenCalledWith(expectedExtractionPath);
+        expect(decompressMock).toHaveBeenCalledWith(ANY_VALID_FILE, expectedExtractionPath, { strip: 1 });
         done();
       });
     });
 
-    it('should call "dest" with given extraction directory', function (done) {
+    it('should call Decompress with given extraction directory and options', function (done) {
       var
         expectedExtractionPath = [ANY_EXTRACTION_BASE_DIR, ANY_EXTRACTION_DIR, ANY_VALID_VERSION].join('/');
 
       underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
-        expect(decompressMock.dest).toHaveBeenCalledWith(expectedExtractionPath);
+        expect(decompressMock).toHaveBeenCalledWith(ANY_VALID_FILE, expectedExtractionPath, { strip: 1 });
         done();
       });
     });
@@ -133,64 +109,9 @@ describe('extractionService', function () {
       });
     });
 
-    function testDecompressArch(archTypeObject) {
-      it('should call the arch type corresponding decompress method for ' + archTypeObject.arch, function (done) {
-        var
-          file = [ANY_VALID_FILE_PATH, archTypeObject.arch].join('.');
-
-        underTest.extract(file, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
-          expect(decompressMock[archTypeObject.expectedFunction]).toHaveBeenCalledWith(DECOMPRESS_ARCH_OPTIONS);
-          done();
-        });
-      });
-    }
-
-    [
-      {
-        arch: 'zip',
-        expectedFunction: 'zip'
-      },
-      {
-        arch: 'tar',
-        expectedFunction: 'tar'
-      },
-      {
-        arch: 'gz',
-        expectedFunction: 'targz'
-      },
-      {
-        arch: 'tgz',
-        expectedFunction: 'targz'
-      },
-      {
-        arch: 'tar.gz',
-        expectedFunction: 'targz'
-      },
-      {
-        arch: 'tar.bz2',
-        expectedFunction: 'tarbz2'
-      }
-    ].forEach(testDecompressArch);
-
-    it('should call "use" with decompress arch type', function (done) {
-      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
-        expect(decompressMock.use).toHaveBeenCalledWith(DECOMPRESS_ARCH_PLUGIN);
-        done();
-      });
-    });
-
-    it('should call "run" with callback function', function (done) {
-      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
-        expect(decompressMock.run).toHaveBeenCalledWith(jasmine.any(Function));
-        done();
-      });
-    });
-
     it('should catch a decompress error', function (done) {
       var expectedError = new Error('any decompress error');
-      decompressMock.run.and.callFake(function (cb) {
-        cb(expectedError);
-      });
+      decompressMock.and.returnValue(Promise.reject(expectedError));
 
       underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
         done.fail('Error should have been caught');
@@ -204,9 +125,7 @@ describe('extractionService', function () {
       var
         expectedExtractionPath = [ANY_EXTRACTION_BASE_DIR, ANY_EXTRACTION_DIR, ANY_VALID_VERSION].join('/');
 
-      decompressMock.run.and.callFake(function (cb) {
-        cb(null, null);
-      });
+      decompressMock.and.returnValue(Promise.resolve([{ path: 'extracted_file' }]));
 
       underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function (path) {
         expect(path).toEqual(expectedExtractionPath);
