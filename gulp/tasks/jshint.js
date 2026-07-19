@@ -1,10 +1,9 @@
 'use strict';
 
-/*jshint strict:false*/
 var
-  jshint = require('gulp-jshint'),
   gulp   = require('gulp'),
-  mapStream = require('map-stream'),
+  spawn = require('child_process').spawn,
+  path = require('path'),
   config = require('../config');
 
 var
@@ -12,21 +11,21 @@ var
     jsFiles: [config.paths.source + '/**/*.js', config.paths.test.base + '/**/*.js', config.paths.gulp + '/**/*.js' ]
   };
 
-var exitOnJshintError = mapStream(function (file, cb) {
-  if (!file.jshint.success) {
-    process.exit(1);
-  } else {
-    cb();
-  }
-});
-
 gulp.task('_lint', function() {
-  return gulp
-    .src(SRC.jsFiles)
-    .pipe(jshint({
-      strict: 'global',
-      node: true
-    }))
-    .pipe(jshint.reporter('jshint-stylish'))
-    .pipe(exitOnJshintError);
+  var eslintCli = path.resolve(process.cwd(), 'node_modules', 'eslint', 'bin', 'eslint.js');
+
+  return new Promise(function (resolve, reject) {
+    var lint = spawn(process.execPath, [eslintCli].concat(SRC.jsFiles), {
+      stdio: 'inherit'
+    });
+
+    lint.on('error', reject);
+    lint.on('exit', function (code) {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error('ESLint failed with exit code ' + code));
+      }
+    });
+  });
 });
