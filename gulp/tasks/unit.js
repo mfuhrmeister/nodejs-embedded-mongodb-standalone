@@ -37,7 +37,7 @@ gulp.task('_istanbul',function(){
     .pipe(istanbul.hookRequire());
 });
 
-gulp.task('_unit',['_istanbul'], function () {
+gulp.task('_unit', gulp.series('_istanbul', function () {
   return gulp
     .src(gutil.env.test || SRC.unit_test)
     .pipe(jasmine({
@@ -47,4 +47,4 @@ gulp.task('_unit',['_istanbul'], function () {
     }))
     .on('error', function() { process.exit(1); } )
     .pipe(istanbul.writeReports());
-});
+}));

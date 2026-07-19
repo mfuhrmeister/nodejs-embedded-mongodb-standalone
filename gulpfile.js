@@ -1,7 +1,6 @@
 'use strict';
 var
   gulp = require('gulp'),
-  sequence = require('run-sequence'),
   requireDir = require('require-dir');
 
 
@@ -9,62 +8,25 @@ requireDir('./gulp/tasks', {
   recurse: true
 });
 
-gulp.task('clean',function (done) {
-  sequence(
-    '_clean',
-    done
-  );
-});
+gulp.task('clean', gulp.series('_clean'));
 
-gulp.task('lint',function (done) {
-  sequence(
-    '_lint',
-    done
-  );
-});
+gulp.task('lint', gulp.series('_lint'));
 
-gulp.task('unit',function (done) {
-  sequence(
-    '_unit',
-    done
-  );
-});
+gulp.task('unit', gulp.series('_unit'));
 
-gulp.task('functional',function (done) {
-  sequence(
-    '_functional',
-    done
-  );
-});
+gulp.task('functional', gulp.series('_functional'));
 
-gulp.task('build',function(done) {
-  sequence(
-    '_clean',
-    '_lint',
-    '_unit',
-    '_functional',
-    done
-  );
-});
+gulp.task('build', gulp.series('_clean', '_lint', '_unit', '_functional'));
 
-gulp.task('test', function(done) {
-  sequence(
-    '_lint',
-    '_unit',
-    '_functional',
-    gracefulShutdownFn(done)
-  );
-});
+gulp.task('test', gulp.series('_lint', '_unit', '_functional', gracefulShutdownFn));
 
-gulp.task('default', ['_watch']);
+gulp.task('default', gulp.series('_watch'));
 
 
 function gracefulShutdownFn(done) {
-  return function() {
-    setTimeout(function() {
-      console.log('graceful shutdown');
-      process.kill(process.pid, 'SIGKILL');
-    }, 1000);
-    done();
-  };
+  setTimeout(function() {
+    console.log('graceful shutdown');
+    process.kill(process.pid, 'SIGKILL');
+  }, 1000);
+  done();
 }

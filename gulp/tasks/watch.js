@@ -12,7 +12,7 @@ var
 gulp.task('_watch', function () {
   return gulp
     .watch(
-    [SRC.jsFiles, SRC.unit_test],
-    ['_lint', '_unit']
-  );
+      [SRC.jsFiles, SRC.unit_test],
+      gulp.series('_lint', '_unit')
+    );
 });
