@@ -35,11 +35,14 @@ var
   VERSION = (args[0]) ? args[0] : '2.4.9',
   DOWNLOAD_DIR = args[1];
 
-nems.distribute(VERSION, DOWNLOAD_DIR)
-  .then(function(path) {
+async function main() {
+  try {
+    var path = await nems.distribute(VERSION, DOWNLOAD_DIR);
     logger.info(MODULE_NAME, sprintf(MESSAGE_EXTRACTED, path));
     logger.info(MODULE_NAME, MESSAGE_SUCCESS);
-  })
-  .catch(function (err) {
+  } catch (err) {
     logger.error(MODULE_NAME, err);
-  });
+  }
+}
+
+main();

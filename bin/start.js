@@ -43,10 +43,13 @@ var
   NOJOURNAL = args[4],
   DB_PATH = args[5];
 
-nems.start(VERSION, DOWNLOAD_DIR, PORT, NOPREALLOC, NOJOURNAL, DB_PATH)
-  .then(function(pid) {
+async function main() {
+  try {
+    var pid = await nems.start(VERSION, DOWNLOAD_DIR, PORT, NOPREALLOC, NOJOURNAL, DB_PATH);
     logger.info(MODULE_NAME, sprintf(MESSAGE_STARTED, pid));
-  })
-  .catch(function (err) {
+  } catch (err) {
     logger.error(MODULE_NAME, err.message);
-  });
+  }
+}
+
+main();

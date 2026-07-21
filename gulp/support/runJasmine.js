@@ -21,7 +21,7 @@ function createJunitReporter(reportDir) {
   });
 }
 
-function runJasmine(specDir, reportDir) {
+async function runJasmine(specDir, reportDir) {
   var runner = new Jasmine();
 
   runner.exitOnCompletion = false;
@@ -39,11 +39,9 @@ function runJasmine(specDir, reportDir) {
   runner.addReporter(createTerminalReporter());
   runner.addReporter(createJunitReporter(reportDir));
 
-  return runner.execute().then(function (passed) {
-    if (!passed) {
-      throw new Error('Jasmine failed');
-    }
-  });
+  if (!await runner.execute()) {
+    throw new Error('Jasmine failed');
+  }
 }
 
 module.exports = runJasmine;

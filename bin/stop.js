@@ -29,10 +29,13 @@ var
   BINPATH = args[0],
   DBPATH = args[1];
 
-nems.stop(BINPATH, DBPATH)
-  .then(function() {
+async function main() {
+  try {
+    await nems.stop(BINPATH, DBPATH);
     logger.info(MODULE_NAME, MESSAGE_STOPPED);
-  })
-  .catch(function (err) {
+  } catch (err) {
     logger.error(MODULE_NAME, err.message);
-  });
+  }
+}
+
+main();
