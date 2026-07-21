@@ -1,7 +1,7 @@
 'use strict';
 
 const
-  rewire = require('rewire'),
+  createMongoService = require('../../../lib/process/mongoService.js').createMongoService,
   events = require('events'),
   path = require('path'),
   testUtil = require('../../testUtil.js'),
@@ -56,16 +56,15 @@ describe('mongoService', function () {
     childProcessMock,
     fsMock,
     processMock,
-    loggerMock;
+    loggerMock,
+    state;
 
   beforeEach(function () {
-    underTest = rewire('../../../lib/process/mongoService.js');
-
     stderrEventEmitter = new events.EventEmitter();
     stdoutEventEmitter = new events.EventEmitter();
 
     childProcessMock = jasmine.createSpyObj('childProcess', ['exec']);
-    childProcessMock.exec.and.returnValue({stderr: stderrEventEmitter, stdout: stdoutEventEmitter});
+    childProcessMock.exec.and.returnValue({pid: ANY_PID, stderr: stderrEventEmitter, stdout: stdoutEventEmitter});
 
     fsMock = {
       promises: {
@@ -79,11 +78,17 @@ describe('mongoService', function () {
 
     loggerMock = jasmine.createSpyObj('logger', ['info']);
 
-    underTest.__set__('childProcess', childProcessMock);
-    underTest.__set__('fs', fsMock);
-    underTest.__set__('process', processMock);
-    underTest.__set__('mongoProcess', undefined);
-    underTest.__set__('logger', loggerMock);
+    state = {
+      mongoProcess: undefined
+    };
+
+    underTest = createMongoService({
+      childProcess: childProcessMock,
+      fs: fsMock,
+      process: processMock,
+      logger: loggerMock,
+      state: state
+    });
   });
 
   it('should be defined', function () {
@@ -115,7 +120,6 @@ describe('mongoService', function () {
             done.fail('exec child process with command ' + test.command + ' should have been resolved');
           });
 
-          underTest.__set__('mongoProcess', {pid: ANY_PID});
           stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
         });
       }
@@ -149,7 +153,7 @@ describe('mongoService', function () {
     describe('mongo process', function () {
 
       it('should resolve with process id if mongo has already started', function (done) {
-        underTest.__set__('mongoProcess', {pid: ANY_PID});
+        state.mongoProcess = {pid: ANY_PID};
 
         underTest.start().then(function (processID) {
           expect(processID).toEqual(ANY_PID);
@@ -217,7 +221,6 @@ describe('mongoService', function () {
           done.fail('resolve with process id if mongo has started should have been resolved');
         });
 
-        underTest.__set__('mongoProcess', {pid: ANY_PID});
         stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
       });
 
@@ -230,18 +233,17 @@ describe('mongoService', function () {
           done.fail('resolve with process id if modern mongo has started should have been resolved');
         });
 
-        underTest.__set__('mongoProcess', {pid: ANY_PID});
         stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING_MODERN);
       });
     });
   });
 
-  describe('stop', function() {
+  describe('stop', function () {
 
     describe('child process execution', function () {
 
-      beforeEach(function(){
-        underTest.__set__('mongoProcess', {pid: ANY_PID});
+      beforeEach(function () {
+        state.mongoProcess = {pid: ANY_PID};
       });
 
       it('should reject when anything throws', function (done) {

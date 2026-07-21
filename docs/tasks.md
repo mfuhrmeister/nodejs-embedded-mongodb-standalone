@@ -23,12 +23,12 @@
 
 - [ ] Decide whether ESM is still worth the migration cost compared to keeping CommonJS
 - [ ] Keep Jasmine unless there is a strong reason to migrate the test runner separately
-- [ ] Remove `rewire`-style testing from the unit suite before changing module format
+- [x] Remove `rewire`-style testing from the unit suite before changing module format
 - [x] Refactor `lib/nems.js` to use explicit dependency seams instead of test-time module replacement
 - [x] Refactor `lib/distributer/extractionService.js` to expose testable seams without private module patching
 - [x] Refactor `lib/distributer/mongodbDownload.js` to expose pure helpers directly and inject I/O dependencies for download behavior
-- [ ] Refactor `lib/process/mongoService.js` to use injected dependencies and instance-based state instead of patched module internals
-- [ ] Update unit tests to stop using `rewire`, `__set__`, and `__get__`
+- [x] Refactor `lib/process/mongoService.js` to use injected dependencies and instance-based state instead of patched module internals
+- [x] Update unit tests to stop using `rewire`, `__set__`, and `__get__`
 
 ### Phase 2: Module Conversion
 
