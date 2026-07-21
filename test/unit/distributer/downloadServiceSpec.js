@@ -2,7 +2,7 @@
 
 const
   os = require('os'),
-  rewire = require('rewire');
+  createDownloadService = require('../../../lib/distributer/downloadService').createDownloadService;
 
 describe('downloadServiceSpec', function () {
 
@@ -22,11 +22,14 @@ describe('downloadServiceSpec', function () {
     mongodbDownloadMock.and.returnValue(Promise.resolve(ANY_VALID_DATA));
 
     errorHandlerMock = jasmine.createSpyObj('errorHandlerMock', ['handleDownloadError']);
-    errorHandlerMock.handleDownloadError.and.callFake(function(err) { throw err;});
+    errorHandlerMock.handleDownloadError.and.callFake(function (err) {
+      throw err;
+    });
 
-    underTest = rewire('../../../lib/distributer/downloadService');
-    underTest.__set__('mongodbDownload', mongodbDownloadMock);
-    underTest.__set__('errorHandler', errorHandlerMock);
+    underTest = createDownloadService({
+      mongodbDownload: mongodbDownloadMock,
+      errorHandler: errorHandlerMock
+    });
   });
 
   it('should be defined', function () {
