@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- [ ] Remove `ramda` by replacing the remaining usage in `lib/distributer/extractionService.js`
+- [x] Remove `ramda` by replacing the remaining usage in `lib/distributer/extractionService.js`
 - [ ] Remove `fs-extra` from `test/testUtil.js` and switch to Node built-in `fs`
 - [ ] Remove `sprintf-js` and replace formatting with template literals
 - [ ] Review whether `npmlog` should stay or be replaced with a lighter built-in approach
