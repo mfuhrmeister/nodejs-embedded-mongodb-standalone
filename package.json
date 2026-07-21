@@ -1,6 +1,6 @@
 {
   "name": "nems",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "nems is a native Promise-based embedded MongoDB distribution library that downloads an appropriate MongoDB build and runs it standalone for integration and functional tests.",
   "homepage": "https://github.com/mfuhrmeister/nodejs-embedded-mongodb-standalone",
   "keywords": [
@@ -51,8 +51,7 @@
     "eslint": "^9.39.5",
     "globals": "^16.4.0",
     "jasmine": "^5.13.0",
-    "jasmine-reporters": "^2.5.2",
-    "rewire": "^9.0.1"
+    "jasmine-reporters": "^2.5.2"
   },
   "dependencies": {
     "extract-zip": "^2.0.1",
