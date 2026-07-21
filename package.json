@@ -41,7 +41,6 @@
     "eslint": "^7.32.0",
     "fs-extra": "^4.0.2",
     "gulp": "^4.0.2",
-    "gulp-istanbul": "^1.0.0",
     "gulp-jasmine": "^2.4.0",
     "gulp-util": "^3.0.1",
     "jasmine-core": "^2.4.1",

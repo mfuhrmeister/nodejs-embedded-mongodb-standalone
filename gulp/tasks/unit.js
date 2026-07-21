@@ -5,7 +5,6 @@ var
   gutil = require('gulp-util'),
   jasmine = require('gulp-jasmine'),
   jasmineReporters = require('jasmine-reporters'),
-  istanbul = require('gulp-istanbul'),
   config = require('../config'),
 
   junitReporterOptions = {
@@ -24,20 +23,10 @@ var
   terminalReporter = new jasmineReporters.TerminalReporter(terminalReporterOptions),
 
   SRC = {
-    jsFiles: [config.paths.source + '/**/*.js'],
     unit_test: config.paths.test.unit + '/**/*'
   };
 
-gulp.task('_istanbul',function(){
-  return gulp
-    .src(SRC.jsFiles)
-    .pipe(istanbul({
-      includeUntested: true
-    }))
-    .pipe(istanbul.hookRequire());
-});
-
-gulp.task('_unit', gulp.series('_istanbul', function () {
+gulp.task('_unit', function () {
   return gulp
     .src(gutil.env.test || SRC.unit_test)
     .pipe(jasmine({
@@ -45,6 +34,5 @@ gulp.task('_unit', gulp.series('_istanbul', function () {
       verbose: true,
       includeStackTrace: false
     }))
-    .on('error', function() { process.exit(1); } )
-    .pipe(istanbul.writeReports());
-}));
+    .on('error', function() { process.exit(1); } );
+});
