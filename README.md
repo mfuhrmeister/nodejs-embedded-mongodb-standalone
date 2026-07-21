@@ -4,6 +4,8 @@
 
 nodejs-embedded-mongodb-standalone is a promise based embedded mongodb distribution library that downloads a appropriate mongodb and utilizes it as standalone, e.g. for integration/functional tests.
 
+Requires Node.js 18 or newer.
+
 ![nodei.co](https://nodei.co/npm/nems.png?downloads=true&downloadRank=true&stars=true)
 
 ![stars](https://img.shields.io/github/stars/mfuhrmeister/nodejs-embedded-mongodb-standalone.svg)
