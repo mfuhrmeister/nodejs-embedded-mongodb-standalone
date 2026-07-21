@@ -270,6 +270,50 @@ describe('mongodbDownload', function () {
       expect(httpsMock.get).not.toHaveBeenCalled();
     });
 
+    it('should include the macOS arm64 archive name in the cached file path', async function () {
+      var expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-macos-arm64-6.0.8.tgz');
+
+      fsMock.promises.stat.and.returnValue(Promise.resolve({}));
+
+      expect(await underTest({
+        version: '6.0.8',
+        platform: 'darwin',
+        arch: 'arm64',
+        download_dir: '/tmp/downloads'
+      })).toEqual(expectedFile);
+
+      expect(httpsMock.get).not.toHaveBeenCalled();
+    });
+
+    it('should include the newer macOS x64 archive name for MongoDB 6+', async function () {
+      var expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-macos-x86_64-6.0.8.tgz');
+
+      fsMock.promises.stat.and.returnValue(Promise.resolve({}));
+
+      expect(await underTest({
+        version: '6.0.8',
+        platform: 'darwin',
+        arch: 'x64',
+        download_dir: '/tmp/downloads'
+      })).toEqual(expectedFile);
+
+      expect(httpsMock.get).not.toHaveBeenCalled();
+    });
+
+    it('should reject old MongoDB versions on macOS arm64', async function () {
+      try {
+        await underTest({
+          version: '2.4.9',
+          platform: 'darwin',
+          arch: 'arm64',
+          download_dir: '/tmp/downloads'
+        });
+        throw new Error('Expected mongodbDownload to reject');
+      } catch (err) {
+        expect(err).toEqual(new Error('unsupported MongoDB version for macOS arm64, use version 6.0.0 or newer'));
+      }
+    });
+
     it('should include the linux distro suffix in the cached file path', async function () {
       var expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-linux-x86_64-ubuntu1404-3.2.8.tgz');
 

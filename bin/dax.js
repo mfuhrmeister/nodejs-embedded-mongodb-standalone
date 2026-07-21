@@ -4,6 +4,7 @@
 process.env.DEBUG = '*';
 
 var
+  os = require('os'),
   logger = require('npmlog'),
   sprintf = require('sprintf-js').sprintf,
   args = process.argv.splice(process.execArgv.length + 2),
@@ -21,6 +22,13 @@ var
   MESSAGE_EXTRACTED = 'Extracted to %s .',
   MESSAGE_SUCCESS = 'Download and extraction completed.';
 
+function getDefaultVersion() {
+  if (os.platform() === 'darwin' && os.arch() === 'arm64') {
+    return '6.0.8';
+  }
+
+  return '2.4.9';
+}
 
 if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
   logger.info(MODULE_NAME, MESSAGE_USAGE);
@@ -32,7 +40,7 @@ if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-
 logger.info(MODULE_NAME, MESSAGE_START);
 
 var
-  VERSION = (args[0]) ? args[0] : '2.4.9',
+  VERSION = (args[0]) ? args[0] : getDefaultVersion(),
   DOWNLOAD_DIR = args[1];
 
 async function main() {
