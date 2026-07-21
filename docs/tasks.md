@@ -40,8 +40,8 @@
 
 ### Phase 3: Verification And Docs
 
-- [ ] Re-run `npm test`, `npm run build`, `npm run dax`, `npm run start`, and `npm run stop` after the migration
-- [ ] Update `README.md` and release notes if module system behavior changes for users
+- [x] Re-run `npm test`, `npm run build`, `npm run dax`, `npm run start`, and `npm run stop` after the migration
+- [x] Update `README.md` and release notes if module system behavior changes for users
 
 ## Process
 

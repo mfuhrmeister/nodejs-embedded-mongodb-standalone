@@ -34,28 +34,29 @@ function getDefaultVersion() {
 
 if (args.length > 6 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
   logger.info(MODULE_NAME, MESSAGE_USAGE);
-  return;
-} else if (args.length === 0) {
-  logger.info(MODULE_NAME, MESSAGE_DEFAULTS);
-}
-
-logger.info(MODULE_NAME, MESSAGE_START);
-
-const
-  VERSION = (args[0]) ? args[0] : getDefaultVersion(),
-  DOWNLOAD_DIR = args[1],
-  PORT = args[2],
-  NOPREALLOC = args[3],
-  NOJOURNAL = args[4],
-  DB_PATH = args[5];
-
-async function main() {
-  try {
-    const pid = await nems.start(VERSION, DOWNLOAD_DIR, PORT, NOPREALLOC, NOJOURNAL, DB_PATH);
-    logger.info(MODULE_NAME, `${MESSAGE_STARTED} ${pid} .`);
-  } catch (err) {
-    logger.error(MODULE_NAME, err.message);
+} else {
+  if (args.length === 0) {
+    logger.info(MODULE_NAME, MESSAGE_DEFAULTS);
   }
-}
 
-main();
+  logger.info(MODULE_NAME, MESSAGE_START);
+
+  const
+    VERSION = (args[0]) ? args[0] : getDefaultVersion(),
+    DOWNLOAD_DIR = args[1],
+    PORT = args[2],
+    NOPREALLOC = args[3],
+    NOJOURNAL = args[4],
+    DB_PATH = args[5];
+
+  async function main() {
+    try {
+      const pid = await nems.start(VERSION, DOWNLOAD_DIR, PORT, NOPREALLOC, NOJOURNAL, DB_PATH);
+      logger.info(MODULE_NAME, `${MESSAGE_STARTED} ${pid} .`);
+    } catch (err) {
+      logger.error(MODULE_NAME, err.message);
+    }
+  }
+
+  main();
+}

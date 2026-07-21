@@ -17,24 +17,25 @@ const
 
 if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
   logger.info(MODULE_NAME, MESSAGE_USAGE);
-  return;
-} else if (args.length === 0) {
-  logger.info(MODULE_NAME, MESSAGE_DEFAULTS);
-}
-
-logger.info(MODULE_NAME, MESSAGE_START);
-
-const
-  BINPATH = args[0],
-  DBPATH = args[1];
-
-async function main() {
-  try {
-    await nems.stop(BINPATH, DBPATH);
-    logger.info(MODULE_NAME, MESSAGE_STOPPED);
-  } catch (err) {
-    logger.error(MODULE_NAME, err.message);
+} else {
+  if (args.length === 0) {
+    logger.info(MODULE_NAME, MESSAGE_DEFAULTS);
   }
-}
 
-main();
+  logger.info(MODULE_NAME, MESSAGE_START);
+
+  const
+    BINPATH = args[0],
+    DBPATH = args[1];
+
+  async function main() {
+    try {
+      await nems.stop(BINPATH, DBPATH);
+      logger.info(MODULE_NAME, MESSAGE_STOPPED);
+    } catch (err) {
+      logger.error(MODULE_NAME, err.message);
+    }
+  }
+
+  main();
+}

@@ -30,25 +30,26 @@ function getDefaultVersion() {
 
 if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
   logger.info(MODULE_NAME, MESSAGE_USAGE);
-  return;
-} else if (args.length === 0) {
-  logger.info(MODULE_NAME, MESSAGE_DEFAULTS);
-}
-
-logger.info(MODULE_NAME, MESSAGE_START);
-
-const
-  VERSION = (args[0]) ? args[0] : getDefaultVersion(),
-  DOWNLOAD_DIR = args[1];
-
-async function main() {
-  try {
-    const extractedPath = await nems.distribute(VERSION, DOWNLOAD_DIR);
-    logger.info(MODULE_NAME, `${MESSAGE_EXTRACTED} ${extractedPath} .`);
-    logger.info(MODULE_NAME, MESSAGE_SUCCESS);
-  } catch (err) {
-    logger.error(MODULE_NAME, err);
+} else {
+  if (args.length === 0) {
+    logger.info(MODULE_NAME, MESSAGE_DEFAULTS);
   }
-}
 
-main();
+  logger.info(MODULE_NAME, MESSAGE_START);
+
+  const
+    VERSION = (args[0]) ? args[0] : getDefaultVersion(),
+    DOWNLOAD_DIR = args[1];
+
+  async function main() {
+    try {
+      const extractedPath = await nems.distribute(VERSION, DOWNLOAD_DIR);
+      logger.info(MODULE_NAME, `${MESSAGE_EXTRACTED} ${extractedPath} .`);
+      logger.info(MODULE_NAME, MESSAGE_SUCCESS);
+    } catch (err) {
+      logger.error(MODULE_NAME, err);
+    }
+  }
+
+  main();
+}

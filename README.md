@@ -21,7 +21,7 @@ The version is mandatory, the download directory may default to the OS temporary
 
 ###### Usage:
 ```javascript
-var nems = require('nems');
+import nems from 'nems';
 
 nems.distribute('3.2.8', '.')
   .then(function (path) {
@@ -35,7 +35,7 @@ You can use the download and extraction service separately:
 
 ###### Usage:
 ```javascript
-var nems = require('nems');
+import nems from 'nems';
 
 nems.download('3.2.8', '.')
   .then(function (file) {
@@ -59,7 +59,7 @@ Start a mongodb for the given file path.
 
 ###### Usage:
 ```javascript
-var nems = require('nems');
+import nems from 'nems';
 
 /**
  * Parameter: 
@@ -84,7 +84,7 @@ A sophisticated module interface to download, extract and start a mongodb at onc
 
 ###### Usage:
 ```javascript
-var nems = require('nems');
+import nems from 'nems';
 
 /**
  * Parameter: 
@@ -121,6 +121,12 @@ nems.stop('path/to/mongodb/installation','path/to/db/working/directory')
 ## Install
 
 `npm install nems`
+
+This package now uses ESM:
+
+```javascript
+import nems from 'nems';
+```
 
 
 ## Scripts
