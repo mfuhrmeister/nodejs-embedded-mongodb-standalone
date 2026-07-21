@@ -11,17 +11,21 @@ var
   PARAMETER_PORT = '--port',
   PARAMETER_NOPREALLOC = '--noprealloc',
   PARAMETER_NOJOURNAL = '--nojournal',
+  PARAMETER_PIDFILE = '--pidfilepath',
   PARAMETER_SHUTDOWN = '--shutdown',
 
   ANY_BIN_PATH = 'ANY_BIN_PATH',
   ANY_DB_PATH = 'ANY_DB_PATH',
   ANY_PORT = 'ANY_PORT',
   ANY_PID = 12356,
+  ANY_PID_FILE_PATH = path.join(ANY_BIN_PATH, 'mongod.pid'),
+  ANY_DB_PID_FILE_PATH = path.join(ANY_DB_PATH, 'mongod.pid'),
 
   ANY_ERROR = 'ANY_ERROR',
   ANY_MONGO_ERROR = 'ANY_MONGO_ERROR',
   ANY_MONGO_MESSAGE = 'ANY_MONGO_MESSAGE',
   MESSAGE_MONGO_WAITING = '[initandlisten] waiting for connections on port',
+  MESSAGE_MONGO_WAITING_MODERN = '"msg":"Waiting for connections"',
   MESSAGE_MONGO_KILLING_PROCESS = 'killing process with pid',
   MESSAGE_MONGO_INIT_EXCEPTION = '[initandlisten] exception in initAndListen',
   MESSAGE_MONGO_BAD_PORT = 'bad --port number',
@@ -37,6 +41,12 @@ var
   ERROR_MESSAGE_MONGO_ADDR_IN_USE  = 'The port you used is already in use.',
   ERROR_MESSAGE_MONGO_UNKNOWN_DB_PATH = 'There doesn\'t seem to be a server running with the given dbpath.';
 
+function createErrorWithCode(message, code) {
+  var err = new Error(message);
+  err.code = code;
+  return err;
+}
+
 describe('mongoService', function () {
 
   var
@@ -44,6 +54,8 @@ describe('mongoService', function () {
     stdoutEventEmitter,
     stderrEventEmitter,
     childProcessMock,
+    fsMock,
+    processMock,
     loggerMock;
 
   beforeEach(function () {
@@ -55,9 +67,21 @@ describe('mongoService', function () {
     childProcessMock = jasmine.createSpyObj('childProcess', ['exec']);
     childProcessMock.exec.and.returnValue({stderr: stderrEventEmitter, stdout: stdoutEventEmitter});
 
+    fsMock = {
+      promises: {
+        readFile: jasmine.createSpy('fs.promises.readFile').and.callFake(function () {
+          return Promise.reject(createErrorWithCode('not found', 'ENOENT'));
+        })
+      }
+    };
+
+    processMock = jasmine.createSpyObj('process', ['kill']);
+
     loggerMock = jasmine.createSpyObj('logger', ['info']);
 
     underTest.__set__('childProcess', childProcessMock);
+    underTest.__set__('fs', fsMock);
+    underTest.__set__('process', processMock);
     underTest.__set__('mongoProcess', undefined);
     underTest.__set__('logger', loggerMock);
   });
@@ -102,14 +126,22 @@ describe('mongoService', function () {
           command: [
             testUtil.escapePath(path.join(ANY_BIN_PATH, MONGOD_COMMAND)),
             PARAMETER_DBPATH,
-            testUtil.escapePath(ANY_BIN_PATH)
+            testUtil.escapePath(ANY_BIN_PATH),
+            PARAMETER_PIDFILE,
+            testUtil.escapePath(ANY_PID_FILE_PATH)
           ].join(' ')
         },
         { params: [null, ANY_PORT], command: [MONGOD_COMMAND, PARAMETER_PORT, ANY_PORT].join(' ')},
         { params: [null, null, true], command: [MONGOD_COMMAND, PARAMETER_NOPREALLOC].join(' ')},
         { params: [null, null, false, true], command: [MONGOD_COMMAND, PARAMETER_NOJOURNAL].join(' ')},
         { params: [null, null, false, false, ANY_DB_PATH],
-          command: [MONGOD_COMMAND, PARAMETER_DBPATH, testUtil.escapePath(ANY_DB_PATH)].join(' ')
+          command: [
+            MONGOD_COMMAND,
+            PARAMETER_DBPATH,
+            testUtil.escapePath(ANY_DB_PATH),
+            PARAMETER_PIDFILE,
+            testUtil.escapePath(ANY_DB_PID_FILE_PATH)
+          ].join(' ')
         }
       ].forEach(testStartChildProcess);
     });
@@ -188,6 +220,19 @@ describe('mongoService', function () {
         underTest.__set__('mongoProcess', {pid: ANY_PID});
         stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
       });
+
+      it('should resolve with info if modern mongo process has started', function (done) {
+
+        underTest.start().then(function (processID) {
+          expect(processID).toEqual(ANY_PID);
+          done();
+        }).catch(function () {
+          done.fail('resolve with process id if modern mongo has started should have been resolved');
+        });
+
+        underTest.__set__('mongoProcess', {pid: ANY_PID});
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING_MODERN);
+      });
     });
   });
 
@@ -196,7 +241,7 @@ describe('mongoService', function () {
     describe('child process execution', function () {
 
       beforeEach(function(){
-        underTest.__set__('mongoProcess', true);
+        underTest.__set__('mongoProcess', {pid: ANY_PID});
       });
 
       it('should reject when anything throws', function (done) {
@@ -243,6 +288,34 @@ describe('mongoService', function () {
         stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
       });
 
+      it('should stop using pid file when available', function (done) {
+        fsMock.promises.readFile.and.returnValue(Promise.resolve(String(ANY_PID)));
+
+        underTest.stop(ANY_BIN_PATH).then(function (message) {
+          expect(message).toEqual(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
+          expect(fsMock.promises.readFile).toHaveBeenCalledWith(ANY_PID_FILE_PATH, 'utf8');
+          expect(processMock.kill).toHaveBeenCalledWith(ANY_PID, 'SIGTERM');
+          expect(childProcessMock.exec).not.toHaveBeenCalled();
+          done();
+        }).catch(function () {
+          done.fail('stop using pid file when available should have been resolved');
+        });
+      });
+
+      it('should reject unknown dbPath when pid file points to a missing process', function (done) {
+        fsMock.promises.readFile.and.returnValue(Promise.resolve(String(ANY_PID)));
+        processMock.kill.and.callFake(function () {
+          throw createErrorWithCode('missing process', 'ESRCH');
+        });
+
+        underTest.stop(ANY_BIN_PATH).then(function () {
+          done.fail('reject unknown dbPath when pid file points to a missing process should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_UNKNOWN_DB_PATH));
+          done();
+        });
+      });
+
       function testStopChildProcess(test) {
         it('should call exec on child_process with command ' + test.command, function (done) {
           underTest.stop.apply(this, test.params).then(function () {
@@ -252,7 +325,9 @@ describe('mongoService', function () {
             done.fail('exec child process with command ' + test.command + ' should have been resolved');
           });
 
-          stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
+          setImmediate(function () {
+            stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
+          });
         });
       }
 
