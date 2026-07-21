@@ -4,7 +4,6 @@ var
   os = require('os'),
   path = require('path'),
   rewire = require('rewire'),
-  Promise = require('bluebird'),
 
   ANY_VALID_FILE = 'ANY_VALID_FILE.zip',
   ANY_VALID_TAR_FILE = 'ANY_VALID_FILE.tar',

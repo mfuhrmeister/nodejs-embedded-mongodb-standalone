@@ -3,7 +3,6 @@
 var
   os = require('os'),
   rewire = require('rewire'),
-  promise = require('bluebird'),
   sprintf = require('sprintf-js').sprintf;
 
 describe('downloadServiceSpec', function () {
@@ -26,7 +25,7 @@ describe('downloadServiceSpec', function () {
 
   beforeEach(function () {
     mongodbDownloadMock = jasmine.createSpy('mongodbDownload');
-    mongodbDownloadMock.and.returnValue(promise.resolve(ANY_VALID_DATA));
+    mongodbDownloadMock.and.returnValue(Promise.resolve(ANY_VALID_DATA));
 
     errorHandlerMock = jasmine.createSpyObj('errorHandlerMock', ['handleDownloadError']);
     errorHandlerMock.handleDownloadError.and.callFake(function(err) { throw err;});
@@ -51,7 +50,7 @@ describe('downloadServiceSpec', function () {
     });
 
     it('should throw an error if mongodbDownload fails', function (done) {
-      mongodbDownloadMock.and.returnValue(promise.reject(ANY_ERROR));
+      mongodbDownloadMock.and.returnValue(Promise.reject(ANY_ERROR));
 
       underTest.download().then(function () {
         done.fail('Error should have been caught');

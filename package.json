@@ -11,7 +11,6 @@
     "standalone",
     "download",
     "promise",
-    "bluebird",
     "node.js"
   ],
   "author": {
@@ -52,7 +51,6 @@
     "rewire": "^9.0.1"
   },
   "dependencies": {
-    "bluebird": "^3.7.2",
     "extract-zip": "^2.0.1",
     "getos": "^3.2.1",
     "npmlog": "^7.0.1",

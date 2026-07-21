@@ -1,8 +1,7 @@
 'use strict';
 
 var
-  rewire = require('rewire'),
-  promise = require('bluebird');
+  rewire = require('rewire');
 
 describe('index', function () {
 
@@ -24,14 +23,14 @@ describe('index', function () {
     underTest = rewire('../../lib/nems.js');
 
     downloadServiceMock = jasmine.createSpyObj('downloadService', ['download']);
-    downloadServiceMock.download.and.returnValue(promise.resolve(ANY_FILE));
+    downloadServiceMock.download.and.returnValue(Promise.resolve(ANY_FILE));
 
     extractionServiceMock = jasmine.createSpyObj('extractionService', ['extract']);
-    extractionServiceMock.extract.and.returnValue(promise.resolve(ANY_DOWNLOAD_DIR));
+    extractionServiceMock.extract.and.returnValue(Promise.resolve(ANY_DOWNLOAD_DIR));
 
     mongoServiceMock = jasmine.createSpyObj('mongoService', ['start', 'stop']);
-    mongoServiceMock.start.and.returnValue(promise.resolve(ANY_PID));
-    mongoServiceMock.stop.and.returnValue(promise.resolve());
+    mongoServiceMock.start.and.returnValue(Promise.resolve(ANY_PID));
+    mongoServiceMock.stop.and.returnValue(Promise.resolve());
 
     underTest.__set__('downloadService', downloadServiceMock);
     underTest.__set__('extractionService', extractionServiceMock);
@@ -46,7 +45,7 @@ describe('index', function () {
     describe(value, function () {
       it('should reject a promise if download fails', function (done) {
         var expectedError = new Error('any download error');
-        downloadServiceMock.download.and.returnValue(promise.reject(expectedError));
+        downloadServiceMock.download.and.returnValue(Promise.reject(expectedError));
 
         underTest[value]().then(function () {
           done.fail('Error should have been caught');
@@ -85,7 +84,7 @@ describe('index', function () {
     describe(value, function () {
       it('should reject a promise if extraction fails', function (done) {
         var expectedError = new Error('any extraction error');
-        extractionServiceMock.extract.and.returnValue(promise.reject(expectedError));
+        extractionServiceMock.extract.and.returnValue(Promise.reject(expectedError));
 
         underTest[value]().then(function () {
           done.fail('Error should have been caught');
@@ -104,7 +103,7 @@ describe('index', function () {
   describe('startMongo', function () {
     it('should reject a promise if start of mongoService fails', function (done) {
       var expectedError = new Error('any startMongo error');
-      mongoServiceMock.start.and.returnValue(promise.reject(expectedError));
+      mongoServiceMock.start.and.returnValue(Promise.reject(expectedError));
 
       underTest.startMongo().then(function () {
         done.fail('Error should have been caught');
@@ -125,7 +124,7 @@ describe('index', function () {
   describe('start', function () {
     it('should reject a promise if any service failed', function (done) {
       var expectedError = new Error('any error');
-      downloadServiceMock.download.and.returnValue(promise.reject(expectedError));
+      downloadServiceMock.download.and.returnValue(Promise.reject(expectedError));
 
       underTest.start().then(function () {
         done.fail('Error should have been caught');
@@ -153,7 +152,7 @@ describe('index', function () {
   describe('stop', function () {
     it('should reject a promise if mongo service failed', function (done) {
       var expectedError = new Error('any error');
-      mongoServiceMock.stop.and.returnValue(promise.reject(expectedError));
+      mongoServiceMock.stop.and.returnValue(Promise.reject(expectedError));
 
       underTest.stop().then(function () {
         done.fail('Error should have been caught');
