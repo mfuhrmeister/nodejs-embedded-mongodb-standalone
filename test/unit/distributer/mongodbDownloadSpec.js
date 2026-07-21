@@ -1,12 +1,12 @@
 'use strict';
 
-var
+const
   events = require('events'),
   path = require('path'),
   rewire = require('rewire');
 
 function createFileStreamMock() {
-  var stream = new events.EventEmitter();
+  const stream = new events.EventEmitter();
 
   stream.close = jasmine.createSpy('close').and.callFake(function (callback) {
     if (callback) {
@@ -18,7 +18,7 @@ function createFileStreamMock() {
 }
 
 function createResponseMock(statusCode, headers) {
-  var response = new events.EventEmitter();
+  const response = new events.EventEmitter();
 
   response.statusCode = statusCode;
   response.headers = headers || {};
@@ -34,14 +34,14 @@ function flushPromises() {
 }
 
 function createEnoentError() {
-  var err = new Error('not found');
+  const err = new Error('not found');
   err.code = 'ENOENT';
   return err;
 }
 
 describe('mongodbDownload', function () {
 
-  var
+  let
     underTest,
     downloadToFile,
     getLinuxDistroSuffix,
@@ -84,13 +84,13 @@ describe('mongodbDownload', function () {
   describe('downloadToFile', function () {
 
     it('should follow redirects and resolve relative redirect locations', async function () {
-      var firstFile = createFileStreamMock();
-      var secondFile = createFileStreamMock();
-      var firstRequest = new events.EventEmitter();
-      var secondRequest = new events.EventEmitter();
-      var firstResponse = createResponseMock(302, { location: '/redirected/file.tgz' });
-      var secondResponse = createResponseMock(200);
-      var promise;
+      const firstFile = createFileStreamMock();
+      const secondFile = createFileStreamMock();
+      const firstRequest = new events.EventEmitter();
+      const secondRequest = new events.EventEmitter();
+      const firstResponse = createResponseMock(302, { location: '/redirected/file.tgz' });
+      const secondResponse = createResponseMock(200);
+      let promise;
 
       fsMock.createWriteStream.and.returnValues(firstFile, secondFile);
       httpsMock.get
@@ -130,8 +130,8 @@ describe('mongodbDownload', function () {
     });
 
     it('should reject when the download status is not 200', async function () {
-      var request = new events.EventEmitter();
-      var response = createResponseMock(500);
+      const request = new events.EventEmitter();
+      const response = createResponseMock(500);
 
       fsMock.createWriteStream.and.returnValue(createFileStreamMock());
       httpsMock.get.and.callFake(function (_options, callback) {
@@ -148,9 +148,9 @@ describe('mongodbDownload', function () {
     });
 
     it('should reject when the request emits an error', async function () {
-      var request = new events.EventEmitter();
-      var expectedError = new Error('network failure');
-      var promise;
+      const request = new events.EventEmitter();
+      const expectedError = new Error('network failure');
+      let promise;
 
       fsMock.createWriteStream.and.returnValue(createFileStreamMock());
       httpsMock.get.and.returnValue(request);
@@ -167,11 +167,11 @@ describe('mongodbDownload', function () {
     });
 
     it('should reject when the response emits an error', async function () {
-      var request = new events.EventEmitter();
-      var response = createResponseMock(200);
-      var file = createFileStreamMock();
-      var expectedError = new Error('stream failure');
-      var promise;
+      const request = new events.EventEmitter();
+      const response = createResponseMock(200);
+      const file = createFileStreamMock();
+      const expectedError = new Error('stream failure');
+      let promise;
 
       fsMock.createWriteStream.and.returnValue(file);
       httpsMock.get.and.callFake(function (_options, callback) {
@@ -229,7 +229,7 @@ describe('mongodbDownload', function () {
       });
 
       it('should reject when getos fails', async function () {
-        var expectedError = new Error('os detection failed');
+        const expectedError = new Error('os detection failed');
 
         mockOsInfo(expectedError);
 
@@ -255,7 +255,7 @@ describe('mongodbDownload', function () {
     });
 
     it('should return the cached file when it already exists', async function () {
-      var expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-win32-x86_64-3.2.8.zip');
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-win32-x86_64-3.2.8.zip');
 
       fsMock.promises.stat.and.returnValue(Promise.resolve({}));
 
@@ -271,7 +271,7 @@ describe('mongodbDownload', function () {
     });
 
     it('should include the macOS arm64 archive name in the cached file path', async function () {
-      var expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-macos-arm64-6.0.8.tgz');
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-macos-arm64-6.0.8.tgz');
 
       fsMock.promises.stat.and.returnValue(Promise.resolve({}));
 
@@ -286,7 +286,7 @@ describe('mongodbDownload', function () {
     });
 
     it('should include the newer macOS x64 archive name for MongoDB 6+', async function () {
-      var expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-macos-x86_64-6.0.8.tgz');
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-macos-x86_64-6.0.8.tgz');
 
       fsMock.promises.stat.and.returnValue(Promise.resolve({}));
 
@@ -315,7 +315,7 @@ describe('mongodbDownload', function () {
     });
 
     it('should include the linux distro suffix in the cached file path', async function () {
-      var expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-linux-x86_64-ubuntu1404-3.2.8.tgz');
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-linux-x86_64-ubuntu1404-3.2.8.tgz');
 
       fsMock.promises.stat.and.returnValue(Promise.resolve({}));
       getosMock.and.callFake(function (callback) {

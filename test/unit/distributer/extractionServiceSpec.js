@@ -1,6 +1,6 @@
 'use strict';
 
-var
+const
   os = require('os'),
   path = require('path'),
   rewire = require('rewire'),
@@ -23,7 +23,7 @@ function createDecompressMock() {
 
 describe('extractionService', function () {
 
-  var
+  let
     underTest,
     extractZipMock,
     tarMock,
@@ -54,7 +54,7 @@ describe('extractionService', function () {
 
   function testForInvalidFile(invalidFile) {
     it('should throw an error if given file (' + invalidFile + ') is invalid', function (done) {
-      var expectedError = new Error(ANY_FILE_ERROR_MESSAGE);
+      const expectedError = new Error(ANY_FILE_ERROR_MESSAGE);
 
       underTest.extract(invalidFile).then(function () {
         done.fail('Error should have been caught');
@@ -67,7 +67,7 @@ describe('extractionService', function () {
 
   function testForInvalidVersion(invalidVersion) {
     it('should throw an error if given version (' + invalidVersion + ') is invalid', function (done) {
-      var expectedError = new Error(ANY_VERSION_ERROR_MESSAGE);
+      const expectedError = new Error(ANY_VERSION_ERROR_MESSAGE);
 
       underTest.extract(ANY_VALID_FILE, invalidVersion).then(function () {
         done.fail('Error should have been caught');
@@ -84,8 +84,7 @@ describe('extractionService', function () {
   describe('extract', function() {
 
     it('should call extractZip with default extraction directory and options for zip files', function (done) {
-      var
-        expectedExtractionPath = path.join(os.tmpdir(), ANY_EXTRACTION_DIR, ANY_VALID_VERSION);
+      const expectedExtractionPath = path.join(os.tmpdir(), ANY_EXTRACTION_DIR, ANY_VALID_VERSION);
 
       underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION).then(function () {
         expect(ensureDirMock).toHaveBeenCalledWith(path.resolve(expectedExtractionPath));
@@ -95,8 +94,7 @@ describe('extractionService', function () {
     });
 
     it('should call tar.x with strip for tar files', function (done) {
-      var
-        expectedExtractionPath = path.join(ANY_EXTRACTION_BASE_DIR, ANY_EXTRACTION_DIR, ANY_VALID_VERSION);
+      const expectedExtractionPath = path.join(ANY_EXTRACTION_BASE_DIR, ANY_EXTRACTION_DIR, ANY_VALID_VERSION);
 
       underTest.extract(ANY_VALID_TAR_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
         expect(ensureDirMock).toHaveBeenCalledWith(path.resolve(expectedExtractionPath));
@@ -113,8 +111,7 @@ describe('extractionService', function () {
     });
 
     it('should call tar.x with gzip for tgz files', function (done) {
-      var
-        expectedExtractionPath = path.join(ANY_EXTRACTION_BASE_DIR, ANY_EXTRACTION_DIR, ANY_VALID_VERSION);
+      const expectedExtractionPath = path.join(ANY_EXTRACTION_BASE_DIR, ANY_EXTRACTION_DIR, ANY_VALID_VERSION);
 
       underTest.extract(ANY_VALID_TGZ_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
         expect(tarMock.x).toHaveBeenCalledWith(jasmine.objectContaining({
@@ -130,9 +127,8 @@ describe('extractionService', function () {
     });
 
     it('should throw an error if arch type is invalid', function (done) {
-      var
-        expectedError = new Error(ANY_ARCH_TYPE_ERROR_MESSAGE),
-        file = [ANY_VALID_FILE_PATH, ANY_INVALID_ARCH_TYPE].join('.');
+      const expectedError = new Error(ANY_ARCH_TYPE_ERROR_MESSAGE);
+      const file = [ANY_VALID_FILE_PATH, ANY_INVALID_ARCH_TYPE].join('.');
 
       underTest.extract(file, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
         done.fail('Error should have been caught');
@@ -143,9 +139,8 @@ describe('extractionService', function () {
     });
 
     it('should reject .tar.bz2 files', function (done) {
-      var
-        expectedError = new Error(ANY_ARCH_TYPE_ERROR_MESSAGE),
-        file = [ANY_VALID_FILE_PATH, 'tar.bz2'].join('.');
+      const expectedError = new Error(ANY_ARCH_TYPE_ERROR_MESSAGE);
+      const file = [ANY_VALID_FILE_PATH, 'tar.bz2'].join('.');
 
       underTest.extract(file, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
         done.fail('Error should have been caught');
@@ -156,7 +151,7 @@ describe('extractionService', function () {
     });
 
     it('should catch an extractZip error', function (done) {
-      var expectedError = new Error('any extraction error');
+      const expectedError = new Error('any extraction error');
       extractZipMock.and.callFake(function () {
         return Promise.reject(expectedError);
       });
@@ -170,7 +165,7 @@ describe('extractionService', function () {
     });
 
     it('should catch a tar.x error', function (done) {
-      var expectedError = new Error('any extraction error');
+      const expectedError = new Error('any extraction error');
       tarMock.x.and.callFake(function () {
         return Promise.reject(expectedError);
       });
@@ -184,8 +179,7 @@ describe('extractionService', function () {
     });
 
     it('should resolve with extraction directory', function (done) {
-      var
-        expectedExtractionPath = path.join(ANY_EXTRACTION_BASE_DIR, ANY_EXTRACTION_DIR, ANY_VALID_VERSION);
+      const expectedExtractionPath = path.join(ANY_EXTRACTION_BASE_DIR, ANY_EXTRACTION_DIR, ANY_VALID_VERSION);
 
       underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function (path) {
         expect(path).toEqual(expectedExtractionPath);
