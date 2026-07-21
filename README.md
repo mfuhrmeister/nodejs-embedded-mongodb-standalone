@@ -2,7 +2,7 @@
 
 ![npm](https://img.shields.io/npm/v/nems.svg) ![license](https://img.shields.io/npm/l/nems.svg) ![github-issues](https://img.shields.io/github/issues/mfuhrmeister/nodejs-embedded-mongodb-standalone.svg)
 
-nodejs-embedded-mongodb-standalone is a promise based embedded mongodb distribution library that downloads a appropriate mongodb and utilizes it as standalone, e.g. for integration/functional tests.
+nems is a native Promise-based embedded MongoDB distribution library that downloads an appropriate MongoDB build and runs it standalone, for example in integration and functional tests.
 
 Requires Node.js 18 or newer.
 
@@ -24,11 +24,12 @@ The version is mandatory, the download directory may default to the OS temporary
 var nems = require('nems');
 
 nems.distribute('3.2.8', '.')
-    .then(function (path) {
-      // do anything else with the 'path' to the extracted mongo directory
-    }).catch(function(err) {
-      // catch any DownloadError, ExtractionError or standard Error
-    });
+  .then(function (path) {
+    // do anything else with the 'path' to the extracted mongo directory
+  })
+  .catch(function (err) {
+    // catch any DownloadError, ExtractionError or standard Error
+  });
 ```
 You can use the download and extraction service separately:
 
@@ -37,18 +38,20 @@ You can use the download and extraction service separately:
 var nems = require('nems');
 
 nems.download('3.2.8', '.')
-    .then(function (file) {
-      // do anything else with the 'file' string
-    }.catch(err) {
-      // catch any DownloadError or standard Error
-    };
-    
+  .then(function (file) {
+    // do anything else with the 'file' string
+  })
+  .catch(function (err) {
+    // catch any DownloadError or standard Error
+  });
+
 nems.extract('/path/to/file.gz', '3.2.8', '.')
-    .then(function (path) {
-      // do anything else with the 'path' to the extracted mongo directory
-    }.catch(err) {
-      // catch any ExtractionError or standard Error
-    };
+  .then(function (path) {
+    // do anything else with the 'path' to the extracted mongo directory
+  })
+  .catch(function (err) {
+    // catch any ExtractionError or standard Error
+  });
 ```
 
 #### Process
@@ -68,11 +71,12 @@ var nems = require('nems');
  * 
  */
 nems.startMongo('path/to/mongodb/installation', 27017, true, true, 'path/to/db/working/directory')
-    .then(function (pid) {
-      // do anything with the returned process id
-    }.catch(err) {
-      // catch any standard Error, e.g. if child process to start mongo crashed
-    };
+  .then(function (pid) {
+    // do anything with the returned process id
+  })
+  .catch(function (err) {
+    // catch any standard Error, e.g. if child process to start mongo crashed
+  });
 ```
 
 #### Interface
@@ -93,11 +97,12 @@ var nems = require('nems');
  * 
  */
 nems.start('3.2.8', '.', 27017, true, true, 'path/to/db/working/directory')
-    .then(function (pid) {
-      // do anything with the returned process id
-    }.catch(err) {
-      // catch any MongoError or standard Error, e.g. if child process to start mongo crashed
-    };
+  .then(function (pid) {
+    // do anything with the returned process id
+  })
+  .catch(function (err) {
+    // catch any MongoError or standard Error, e.g. if child process to start mongo crashed
+  });
     
 /**
  * Parameter: 
@@ -105,27 +110,28 @@ nems.start('3.2.8', '.', 27017, true, true, 'path/to/db/working/directory')
  *  dbpath - db working directory, if different from installation path (optional)
  */
 nems.stop('path/to/mongodb/installation','path/to/db/working/directory')
-    .then(function (successMessage) {
-      // do anything after mongodb shutdown
-    }.catch(err) {
-      // catch any MongoError or standard Error, e.g. if child process to start mongo crashed
-    };
+  .then(function (successMessage) {
+    // do anything after mongodb shutdown
+  })
+  .catch(function (err) {
+    // catch any MongoError or standard Error, e.g. if child process to stop mongo crashed
+  });
 ```
 
 ## Install
 
-`npm i -S nems`
+`npm install nems`
 
 
 ## Scripts
 Within this module use:
 
- - **npm start** : `node bin/start [version [directory [port [noprealloc [nojournal [dbpath]]]]]]` will download, extract and start a mongodb for given version, download directory and additional parameter.
- - **npm run dax** : `node bin/dax [version [directory]]` will download and extract mongodb for given version and download directory.
+- **npm start** : `node bin/start.js [version [directory [port [noprealloc [nojournal [dbpath]]]]]]` downloads, extracts, and starts MongoDB for the given version, download directory, and optional parameters.
+- **npm run dax** : `node bin/dax.js [version [directory]]` downloads and extracts MongoDB for the given version and download directory.
  
- - **npm run stop** : `node bin/stop [binPath [dbpath]]` will stop mongodb for given db installation path and/or working directory.
+- **npm run stop** : `node bin/stop.js [binPath [dbpath]]` stops MongoDB for the given installation path and optional working directory.
  
- If no parameters are given, defaults (version 2.4.9 and OS temp folder, resp. dbpath) are used.  
+ If no parameters are given, defaults (version 2.4.9 and the OS temp folder, respectively dbpath) are used.  
  Use only the 'h' flag to see further usage information.  
  *HINT: use double-minus to pass parameters to npm run command, e.g `npm start -- version`*
 

@@ -27,7 +27,7 @@ logger.info(MODULE_NAME, MESSAGE_START);
 
 var
   BINPATH = args[0],
-  DBPATH = args[0];
+  DBPATH = args[1];
 
 nems.stop(BINPATH, DBPATH)
   .then(function() {

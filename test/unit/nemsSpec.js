@@ -150,6 +150,13 @@ describe('index', function () {
   });
 
   describe('stop', function () {
+    it('should call stop of mongoService with binPath and dbPath', function (done) {
+      underTest.stop(ANY_BIN_PATH, ANY_DB_PATH).then(function () {
+        expect(mongoServiceMock.stop).toHaveBeenCalledWith(ANY_BIN_PATH, ANY_DB_PATH);
+        done();
+      });
+    });
+
     it('should reject a promise if mongo service failed', function (done) {
       var expectedError = new Error('any error');
       mongoServiceMock.stop.and.returnValue(Promise.reject(expectedError));
