@@ -15,7 +15,7 @@
 - [ ] Simplify small helper functions with modern JavaScript syntax where it improves readability
 - [ ] Keep the project in CommonJS unless there is a strong reason to migrate to ESM
 - [x] Evaluate whether Gulp can be replaced with plain npm scripts or small Node-based task runners
-- [ ] Remove the remaining Gulp-specific files and dependency if they are no longer needed
+- [x] Remove the remaining Gulp-specific files and dependency if they are no longer needed
 
 ## Process
 

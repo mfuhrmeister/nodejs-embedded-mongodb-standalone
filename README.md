@@ -137,7 +137,7 @@ Within this module use:
 
 Within the source code project:
 
-- **npm test** : `./node_modules/gulp/bin/gulp.js test` runs eslint on gulp, test and source files and runs all tests.
+- **npm test** : `npm run lint && npm run unit && npm run functional` runs eslint on source, test, and script files and runs all tests.
 
 ## Contributing
 
