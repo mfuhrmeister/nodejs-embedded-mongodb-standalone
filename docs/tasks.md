@@ -26,7 +26,7 @@
 - [ ] Remove `rewire`-style testing from the unit suite before changing module format
 - [x] Refactor `lib/nems.js` to use explicit dependency seams instead of test-time module replacement
 - [x] Refactor `lib/distributer/extractionService.js` to expose testable seams without private module patching
-- [ ] Refactor `lib/distributer/mongodbDownload.js` to expose pure helpers directly and inject I/O dependencies for download behavior
+- [x] Refactor `lib/distributer/mongodbDownload.js` to expose pure helpers directly and inject I/O dependencies for download behavior
 - [ ] Refactor `lib/process/mongoService.js` to use injected dependencies and instance-based state instead of patched module internals
 - [ ] Update unit tests to stop using `rewire`, `__set__`, and `__get__`
 

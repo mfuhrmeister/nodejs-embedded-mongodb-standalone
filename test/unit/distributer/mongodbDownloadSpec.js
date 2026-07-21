@@ -3,7 +3,7 @@
 const
   events = require('events'),
   path = require('path'),
-  rewire = require('rewire');
+  createMongodbDownload = require('../../../lib/distributer/mongodbDownload.js').createMongodbDownload;
 
 function createFileStreamMock() {
   const stream = new events.EventEmitter();
@@ -68,13 +68,14 @@ describe('mongodbDownload', function () {
 
     getosMock = jasmine.createSpy('getos');
 
-    underTest = rewire('../../../lib/distributer/mongodbDownload.js');
-    underTest.__set__('fs', fsMock);
-    underTest.__set__('https', httpsMock);
-    underTest.__set__('getos', getosMock);
+    underTest = createMongodbDownload({
+      fs: fsMock,
+      https: httpsMock,
+      getos: getosMock
+    });
 
-    downloadToFile = underTest.__get__('downloadToFile');
-    getLinuxDistroSuffix = underTest.__get__('getLinuxDistroSuffix');
+    downloadToFile = underTest.downloadToFile;
+    getLinuxDistroSuffix = underTest.getLinuxDistroSuffix;
   });
 
   it('should be defined', function () {
