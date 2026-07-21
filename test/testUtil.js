@@ -1,17 +1,15 @@
 'use strict';
 
 var
-  fs = require('fs-extra');
+  fs = require('fs');
 
 function mkdir(path) {
-   fs.mkdirsSync(path);
+  fs.mkdirSync(path, { recursive: true });
 }
 
 function rm(path) {
-  if (fs.pathExistsSync(path)) {
-    fs.emptyDir(path, function() {
-      fs.rmdir(path);
-    });
+  if (fs.existsSync(path)) {
+    fs.rmSync(path, { recursive: true, force: true });
   }
 }
 
