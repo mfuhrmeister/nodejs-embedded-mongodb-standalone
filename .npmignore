@@ -15,5 +15,4 @@ coverage
 info.txt
 TODO.txt
 .gitignore
-.jshintrc
 .npmignore

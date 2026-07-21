@@ -4,7 +4,7 @@ var
 
 require('./gulp/tasks/clean');
 require('./gulp/tasks/functional');
-require('./gulp/tasks/jshint');
+require('./gulp/tasks/lint');
 require('./gulp/tasks/release');
 require('./gulp/tasks/unit');
 require('./gulp/tasks/watch');
