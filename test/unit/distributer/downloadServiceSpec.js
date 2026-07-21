@@ -10,17 +10,12 @@ describe('downloadServiceSpec', function () {
     underTest,
     mongodbDownloadMock,
     errorHandlerMock,
-    loggerMock,
 
-    DEFAULT_VERSION = 'DEFAULT_VERSION',
-    DEFAULT_DOWNLOAD_FOLDER_MESSAGE = 'DEFAULT_DOWNLOAD_FOLDER_MESSAGE',
     ANY_VALID_VERSION = 'ANY_VALID_VERSION',
-    ANY_INVALID_VERSION = 'ANY_INVALID_VERSION',
     ANY_DOWNLOAD_DIR = 'ANY_DOWNLOAD_DIR',
     ANY_VALID_DATA = 'ANY_VALID_DATA',
     ANY_ERROR_MESSAGE = 'ANY_ERROR_MESSAGE',
-    ANY_ERROR = new Error(ANY_ERROR_MESSAGE),
-    LOG_MESSAGE = 'Starting download of mongodb';
+    ANY_ERROR = new Error(ANY_ERROR_MESSAGE);
 
   beforeEach(function () {
     mongodbDownloadMock = jasmine.createSpy('mongodbDownload');
@@ -29,13 +24,9 @@ describe('downloadServiceSpec', function () {
     errorHandlerMock = jasmine.createSpyObj('errorHandlerMock', ['handleDownloadError']);
     errorHandlerMock.handleDownloadError.and.callFake(function(err) { throw err;});
 
-    loggerMock = jasmine.createSpyObj('logger', ['info']);
-
     underTest = rewire('../../../lib/distributer/downloadService');
     underTest.__set__('mongodbDownload', mongodbDownloadMock);
     underTest.__set__('errorHandler', errorHandlerMock);
-    underTest.__set__('logger', loggerMock);
-    underTest.__set__('INFO_MESSAGE_DOWNLOAD_STARTED', LOG_MESSAGE);
   });
 
   it('should be defined', function () {
@@ -60,26 +51,22 @@ describe('downloadServiceSpec', function () {
       });
     });
 
-    it('should call mongodbDownload and log with default download directory', function (done) {
+    it('should call mongodbDownload with default download directory', function (done) {
       var
-        EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: os.tmpdir()},
-        EXPECTED_LOG_MESSAGE = `${LOG_MESSAGE} ${ANY_VALID_VERSION} to a mongodb-download directory under ${os.tmpdir()}`;
+        EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: os.tmpdir()};
 
       underTest.download(ANY_VALID_VERSION).then(function () {
         expect(mongodbDownloadMock).toHaveBeenCalledWith(EXPECTED_OPTIONS);
-        expect(loggerMock.info.calls.argsFor(0)[1]).toEqual(EXPECTED_LOG_MESSAGE);
         done();
       });
     });
 
     it('should call mongodbDownload with download options', function (done) {
       var
-        EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: ANY_DOWNLOAD_DIR},
-        EXPECTED_LOG_MESSAGE = `${LOG_MESSAGE} ${ANY_VALID_VERSION} to a mongodb-download directory under ${ANY_DOWNLOAD_DIR}`;
+        EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: ANY_DOWNLOAD_DIR};
 
       underTest.download(ANY_VALID_VERSION, ANY_DOWNLOAD_DIR).then(function () {
         expect(mongodbDownloadMock).toHaveBeenCalledWith(EXPECTED_OPTIONS);
-        expect(loggerMock.info.calls.argsFor(0)[1]).toEqual(EXPECTED_LOG_MESSAGE);
         done();
       });
     });
