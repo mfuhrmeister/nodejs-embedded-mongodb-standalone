@@ -1,6 +1,6 @@
 'use strict';
 
-var
+const
   Jasmine = require('jasmine'),
   jasmineReporters = require('jasmine-reporters');
 
@@ -22,7 +22,7 @@ function createJunitReporter(reportDir) {
 }
 
 async function runJasmine(specDir, reportDir) {
-  var runner = new Jasmine();
+  const runner = new Jasmine();
 
   runner.exitOnCompletion = false;
   runner.env.configure({
