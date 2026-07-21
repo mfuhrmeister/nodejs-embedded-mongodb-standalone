@@ -3,11 +3,11 @@
 // toogle debug output for mongodb-download
 process.env.DEBUG = '*';
 
-var
+const
   os = require('os'),
   logger = require('../lib/logger'),
   args = process.argv.splice(process.execArgv.length + 2),
-  
+
   nems = require('../lib/nems'),
 
   MODULE_NAME = require('../package.json').name,
@@ -38,14 +38,14 @@ if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-
 
 logger.info(MODULE_NAME, MESSAGE_START);
 
-var
+const
   VERSION = (args[0]) ? args[0] : getDefaultVersion(),
   DOWNLOAD_DIR = args[1];
 
 async function main() {
   try {
-    var path = await nems.distribute(VERSION, DOWNLOAD_DIR);
-    logger.info(MODULE_NAME, `${MESSAGE_EXTRACTED} ${path} .`);
+    const extractedPath = await nems.distribute(VERSION, DOWNLOAD_DIR);
+    logger.info(MODULE_NAME, `${MESSAGE_EXTRACTED} ${extractedPath} .`);
     logger.info(MODULE_NAME, MESSAGE_SUCCESS);
   } catch (err) {
     logger.error(MODULE_NAME, err);

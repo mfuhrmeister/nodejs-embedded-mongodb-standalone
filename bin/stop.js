@@ -1,9 +1,9 @@
 /** stops a mongodb with given db path **/
 
-var
+const
   logger = require('../lib/logger'),
   args = process.argv.splice(process.execArgv.length + 2),
-  
+
   nems = require('../lib/nems'),
 
   MODULE_NAME = require('../package.json').name,
@@ -25,7 +25,7 @@ if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-
 
 logger.info(MODULE_NAME, MESSAGE_START);
 
-var
+const
   BINPATH = args[0],
   DBPATH = args[1];
 
