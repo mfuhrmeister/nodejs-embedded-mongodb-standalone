@@ -1,0 +1,23 @@
+# Tasks
+
+## Current Focus
+
+- [ ] Remove `ramda` by replacing the remaining usage in `lib/distributer/extractionService.js`
+- [ ] Remove `fs-extra` from `test/testUtil.js` and switch to Node built-in `fs`
+- [ ] Remove `sprintf-js` and replace formatting with template literals
+- [ ] Review whether `npmlog` should stay or be replaced with a lighter built-in approach
+- [ ] Keep `getos` for now unless Linux distro detection is redesigned
+
+## Modernization
+
+- [ ] Replace remaining `var` declarations with `const` and `let` where appropriate
+- [ ] Simplify small helper functions with modern JavaScript syntax where it improves readability
+- [ ] Keep the project in CommonJS unless there is a strong reason to migrate to ESM
+- [ ] Evaluate whether Gulp can be replaced with plain npm scripts or small Node-based task runners
+
+## Process
+
+- [ ] Keep each cleanup as a separate commit
+- [ ] Run targeted tests after each dependency removal
+- [ ] Run lint and diagnostics after each code change
+- [ ] Update `README.md` if user-facing behavior changes
