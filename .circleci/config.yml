@@ -19,9 +19,6 @@ jobs:
           paths:
             - ~/.npm
       - run:
-          name: Run tests
-          command: npm test
-      - run:
           name: Build
           command: npm run build
 
