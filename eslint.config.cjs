@@ -6,7 +6,7 @@ module.exports = [
   {
     files: ['**/*.js'],
     languageOptions: {
-      ecmaVersion: 5,
+      ecmaVersion: 2022,
       sourceType: 'commonjs',
       globals: Object.assign({}, globals.node, {
         after: 'readonly',
