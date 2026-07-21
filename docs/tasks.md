@@ -5,7 +5,7 @@
 - [x] Remove `ramda` by replacing the remaining usage in `lib/distributer/extractionService.js`
 - [x] Remove `fs-extra` from `test/testUtil.js` and switch to Node built-in `fs`
 - [x] Remove `sprintf-js` and replace formatting with template literals
-- [ ] Review whether `npmlog` should stay or be replaced with a lighter built-in approach
+- [x] Replace deprecated `npmlog` with a minimal local logger and keep CLI output simple
 - [ ] Keep `getos` for now unless Linux distro detection is redesigned
 
 ## Modernization

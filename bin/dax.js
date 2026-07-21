@@ -5,7 +5,7 @@ process.env.DEBUG = '*';
 
 var
   os = require('os'),
-  logger = require('npmlog'),
+  logger = require('../lib/logger'),
   args = process.argv.splice(process.execArgv.length + 2),
   
   nems = require('../lib/nems'),

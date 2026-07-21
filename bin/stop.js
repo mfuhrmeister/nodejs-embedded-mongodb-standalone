@@ -1,7 +1,7 @@
 /** stops a mongodb with given db path **/
 
 var
-  logger = require('npmlog'),
+  logger = require('../lib/logger'),
   args = process.argv.splice(process.execArgv.length + 2),
   
   nems = require('../lib/nems'),
