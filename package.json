@@ -47,7 +47,6 @@
     "gulp": "^5.0.1",
     "jasmine": "^5.13.0",
     "jasmine-reporters": "^2.5.2",
-    "require-dir": "^1.2.0",
     "rewire": "^9.0.1"
   },
   "dependencies": {

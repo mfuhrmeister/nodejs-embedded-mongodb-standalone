@@ -1,12 +1,13 @@
 'use strict';
 var
-  gulp = require('gulp'),
-  requireDir = require('require-dir');
+  gulp = require('gulp');
 
-
-requireDir('./gulp/tasks', {
-  recurse: true
-});
+require('./gulp/tasks/clean');
+require('./gulp/tasks/functional');
+require('./gulp/tasks/jshint');
+require('./gulp/tasks/release');
+require('./gulp/tasks/unit');
+require('./gulp/tasks/watch');
 
 gulp.task('clean', gulp.series('_clean'));
 
