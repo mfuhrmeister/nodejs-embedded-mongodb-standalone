@@ -13,7 +13,7 @@
 
 - [x] Replace remaining `var` declarations with `const` and `let` where appropriate
 - [x] Simplify small helper functions with modern JavaScript syntax where it improves readability
-- [ ] Keep the project in CommonJS unless there is a strong reason to migrate to ESM
+- [x] Keep the project in CommonJS unless there is a strong reason to migrate to ESM
 - [x] Evaluate whether Gulp can be replaced with plain npm scripts or small Node-based task runners
 - [x] Remove the remaining Gulp-specific files and dependency if they are no longer needed
 
@@ -21,8 +21,8 @@
 
 ### Phase 1: Testing And Seams
 
-- [ ] Decide whether ESM is still worth the migration cost compared to keeping CommonJS
-- [ ] Keep Jasmine unless there is a strong reason to migrate the test runner separately
+- [x] Decide whether ESM is still worth the migration cost compared to keeping CommonJS for now
+- [x] Keep Jasmine unless there is a strong reason to migrate the test runner separately
 - [x] Remove `rewire`-style testing from the unit suite before changing module format
 - [x] Refactor `lib/nems.js` to use explicit dependency seams instead of test-time module replacement
 - [x] Refactor `lib/distributer/extractionService.js` to expose testable seams without private module patching
