@@ -24,8 +24,12 @@
     "bin"
   ],
   "scripts": {
-    "build": "./node_modules/gulp/bin/gulp.js build",
-    "test": "./node_modules/gulp/bin/gulp.js test",
+    "clean": "node scripts/clean.js",
+    "lint": "eslint \"./lib/**/*.js\" \"./test/**/*.js\" \"./gulp/**/*.js\" \"./scripts/**/*.js\" \"./*.js\"",
+    "unit": "node scripts/run-jasmine.js test/unit target/test-reports/unit",
+    "functional": "node scripts/run-jasmine.js test/functional target/test-reports/functional",
+    "build": "npm run clean && npm run lint && npm run unit && npm run functional",
+    "test": "npm run lint && npm run unit && npm run functional",
     "dax": "node bin/dax",
     "start": "node bin/start",
     "stop": "node bin/stop"
