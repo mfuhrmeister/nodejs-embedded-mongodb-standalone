@@ -1,18 +1,17 @@
 'use strict';
-var
+const
   testUtil = require('../testUtil.js'),
-  originalTimeout,
-
   ANY_VERSION = '3.2.8',
   ANY_DOWNLOAD_PATH_WITH_SPACE = 'test folder',
   ANY_DB_PATH_WITH_SPACE = 'test folder',
-
-
   SUCCESS_MESSAGE_MONGO_SHUTDOWN = 'The mongodb instance has been shutdown!';
+
+let
+  originalTimeout;
 
 xdescribe('nems', function () {
 
-  var
+  let
     underTest;
 
   beforeEach(function () {

@@ -1,12 +1,12 @@
 'use strict';
 
-var
+const
   os = require('os'),
   rewire = require('rewire');
 
 describe('downloadServiceSpec', function () {
 
-  var
+  let
     underTest,
     mongodbDownloadMock,
     errorHandlerMock,
@@ -52,8 +52,7 @@ describe('downloadServiceSpec', function () {
     });
 
     it('should call mongodbDownload with default download directory', function (done) {
-      var
-        EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: os.tmpdir()};
+      const EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: os.tmpdir()};
 
       underTest.download(ANY_VALID_VERSION).then(function () {
         expect(mongodbDownloadMock).toHaveBeenCalledWith(EXPECTED_OPTIONS);
@@ -62,8 +61,7 @@ describe('downloadServiceSpec', function () {
     });
 
     it('should call mongodbDownload with download options', function (done) {
-      var
-        EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: ANY_DOWNLOAD_DIR};
+      const EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: ANY_DOWNLOAD_DIR};
 
       underTest.download(ANY_VALID_VERSION, ANY_DOWNLOAD_DIR).then(function () {
         expect(mongodbDownloadMock).toHaveBeenCalledWith(EXPECTED_OPTIONS);

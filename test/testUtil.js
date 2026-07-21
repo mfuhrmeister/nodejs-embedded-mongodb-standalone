@@ -1,6 +1,6 @@
 'use strict';
 
-var
+const
   fs = require('fs');
 
 function mkdir(path) {

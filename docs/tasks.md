@@ -10,7 +10,7 @@
 
 ## Modernization
 
-- [ ] Replace remaining `var` declarations with `const` and `let` where appropriate
+- [x] Replace remaining `var` declarations with `const` and `let` where appropriate
 - [ ] Simplify small helper functions with modern JavaScript syntax where it improves readability
 - [ ] Keep the project in CommonJS unless there is a strong reason to migrate to ESM
 - [ ] Evaluate whether Gulp can be replaced with plain npm scripts or small Node-based task runners

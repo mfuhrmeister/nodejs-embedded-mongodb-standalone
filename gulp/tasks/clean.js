@@ -1,6 +1,6 @@
 'use strict';
 
-var
+const
   gulp = require('gulp'),
   loadDel = Function('specifier', 'return import(specifier);');
 

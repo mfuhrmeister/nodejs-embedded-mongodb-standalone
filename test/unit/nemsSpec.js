@@ -1,11 +1,11 @@
 'use strict';
 
-var
+const
   rewire = require('rewire');
 
 describe('index', function () {
 
-  var
+  let
     underTest,
     downloadServiceMock,
     extractionServiceMock,
@@ -44,7 +44,7 @@ describe('index', function () {
   function testDownload(value) {
     describe(value, function () {
       it('should reject a promise if download fails', function (done) {
-        var expectedError = new Error('any download error');
+        const expectedError = new Error('any download error');
         downloadServiceMock.download.and.returnValue(Promise.reject(expectedError));
 
         underTest[value]().then(function () {
@@ -83,7 +83,7 @@ describe('index', function () {
   function testExtractionError(value) {
     describe(value, function () {
       it('should reject a promise if extraction fails', function (done) {
-        var expectedError = new Error('any extraction error');
+        const expectedError = new Error('any extraction error');
         extractionServiceMock.extract.and.returnValue(Promise.reject(expectedError));
 
         underTest[value]().then(function () {
@@ -102,7 +102,7 @@ describe('index', function () {
 
   describe('startMongo', function () {
     it('should reject a promise if start of mongoService fails', function (done) {
-      var expectedError = new Error('any startMongo error');
+      const expectedError = new Error('any startMongo error');
       mongoServiceMock.start.and.returnValue(Promise.reject(expectedError));
 
       underTest.startMongo().then(function () {
@@ -123,7 +123,7 @@ describe('index', function () {
 
   describe('start', function () {
     it('should reject a promise if any service failed', function (done) {
-      var expectedError = new Error('any error');
+      const expectedError = new Error('any error');
       downloadServiceMock.download.and.returnValue(Promise.reject(expectedError));
 
       underTest.start().then(function () {
@@ -135,7 +135,7 @@ describe('index', function () {
     });
 
     it('should call all services and return the process id', function (done) {
-      var expectedBinPath = ANY_DOWNLOAD_DIR + '/bin';
+      const expectedBinPath = ANY_DOWNLOAD_DIR + '/bin';
 
       underTest.start(ANY_VERSION, ANY_DOWNLOAD_DIR, ANY_PORT, true, true, ANY_DB_PATH).then(function (pid) {
         expect(downloadServiceMock.download).toHaveBeenCalledWith(ANY_VERSION, ANY_DOWNLOAD_DIR);
@@ -158,7 +158,7 @@ describe('index', function () {
     });
 
     it('should reject a promise if mongo service failed', function (done) {
-      var expectedError = new Error('any error');
+      const expectedError = new Error('any error');
       mongoServiceMock.stop.and.returnValue(Promise.reject(expectedError));
 
       underTest.stop().then(function () {

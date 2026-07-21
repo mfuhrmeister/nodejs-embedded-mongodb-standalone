@@ -1,7 +1,7 @@
 'use strict';
 
 describe('errors', function () {
-  var errors = require('../../../lib/error/errors.js');
+  const errors = require('../../../lib/error/errors.js');
 
   it('should be defined', function () {
     expect(errors).toBeDefined();
@@ -10,7 +10,7 @@ describe('errors', function () {
   function testError(expectedErrorObject) {
     describe(expectedErrorObject.name, function () {
 
-      var error;
+      let error;
 
       beforeEach(function() {
         error = new errors[expectedErrorObject.name](expectedErrorObject.message);
@@ -26,20 +26,20 @@ describe('errors', function () {
         });
 
         it('predicate should return false, when called with another Error type', function () {
-          var expectedError = new errors[expectedErrorObject.name]();
+          const expectedError = new errors[expectedErrorObject.name]();
           expectedError.name = 'ANY_OTHER_ERROR';
           expect(error.predicate(expectedError)).toBeFalsy();
         });
 
         it('predicate should return true, when called with same Error type', function () {
-          var expectedError = new errors[expectedErrorObject.name]();
+          const expectedError = new errors[expectedErrorObject.name]();
           expect(error.predicate(expectedError)).toBeTruthy();
         });
 
       });
 
       it('should be initialized with custom message and status code', function () {
-        var
+        const
           expectedStatusCode = 999,
           expectedMessage = 'any additional error message';
 
@@ -51,7 +51,7 @@ describe('errors', function () {
     });
   }
 
-  var expectedErrors = [
+  const expectedErrors = [
     {
       name : 'DownloadError',
       message: 'Download went wrong!',

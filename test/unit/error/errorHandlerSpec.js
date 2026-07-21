@@ -1,20 +1,20 @@
 'use strict';
 
-var
+const
   DownloadError = require('../../../lib/error/errors').DownloadError,
   WriteError = require('../../../lib/error/errors').WriteError,
   ExtractionError = require('../../../lib/error/errors').ExtractionError;
 
 describe('errorHandler', function () {
 
-  var underTest = require('../../../lib/error/errorHandler');
+  const underTest = require('../../../lib/error/errorHandler');
 
   it('should be defined', function () {
     expect(underTest).toBeDefined();
   });
 
   it('should throw a DownloadError', function () {
-    var thrownError = {message: 'any error', statusCode: 401};
+    const thrownError = {message: 'any error', statusCode: 401};
     try {
       underTest.handleDownloadError(thrownError);
     } catch(err) {
@@ -23,7 +23,7 @@ describe('errorHandler', function () {
   });
 
   it('should throw a WriteError', function () {
-    var thrownError = {message: 'any error', statusCode: 500};
+    const thrownError = {message: 'any error', statusCode: 500};
     try {
       underTest.handleWriteError(thrownError);
     } catch(err) {
@@ -32,7 +32,7 @@ describe('errorHandler', function () {
   });
 
   it('should throw a ExtractionError', function () {
-    var thrownError = {message: 'any error', statusCode: 500};
+    const thrownError = {message: 'any error', statusCode: 500};
     try {
       underTest.handleExtractionError(thrownError);
     } catch(err) {
@@ -42,7 +42,7 @@ describe('errorHandler', function () {
 
 
   it('should throw original WriteError', function () {
-    var thrownError = new WriteError();
+    const thrownError = new WriteError();
     try {
       underTest.handleDownloadError(thrownError);
     } catch(err) {

@@ -1,21 +1,21 @@
 'use strict';
 
-var
+const
   gulp   = require('gulp'),
   spawn = require('child_process').spawn,
   path = require('path'),
   config = require('../config');
 
-var
+const
   SRC = {
     jsFiles: [config.paths.source + '/**/*.js', config.paths.test.base + '/**/*.js', config.paths.gulp + '/**/*.js' ]
   };
 
 gulp.task('_lint', function() {
-  var eslintCli = path.resolve(process.cwd(), 'node_modules', 'eslint', 'bin', 'eslint.js');
+  const eslintCli = path.resolve(process.cwd(), 'node_modules', 'eslint', 'bin', 'eslint.js');
 
   return new Promise(function (resolve, reject) {
-    var lint = spawn(process.execPath, [eslintCli].concat(SRC.jsFiles), {
+    const lint = spawn(process.execPath, [eslintCli].concat(SRC.jsFiles), {
       stdio: 'inherit'
     });
 

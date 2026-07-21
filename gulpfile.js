@@ -1,5 +1,5 @@
 'use strict';
-var
+const
   gulp = require('gulp');
 
 require('./gulp/tasks/clean');

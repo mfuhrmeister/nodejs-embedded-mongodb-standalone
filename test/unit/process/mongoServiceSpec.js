@@ -1,6 +1,6 @@
 'use strict';
 
-var
+const
   rewire = require('rewire'),
   events = require('events'),
   path = require('path'),
@@ -42,14 +42,14 @@ var
   ERROR_MESSAGE_MONGO_UNKNOWN_DB_PATH = 'There doesn\'t seem to be a server running with the given dbpath.';
 
 function createErrorWithCode(message, code) {
-  var err = new Error(message);
+  const err = new Error(message);
   err.code = code;
   return err;
 }
 
 describe('mongoService', function () {
 
-  var
+  let
     underTest,
     stdoutEventEmitter,
     stderrEventEmitter,
@@ -160,7 +160,7 @@ describe('mongoService', function () {
       });
 
       it('should reject on error in mongo process', function (done) {
-        var ANY_ROOT_CAUSE_MESSAGE = 'any error';
+        const ANY_ROOT_CAUSE_MESSAGE = 'any error';
 
         underTest.start().then(function () {
           done.fail('reject on error in mongo process should have been caught');
