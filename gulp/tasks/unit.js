@@ -2,7 +2,6 @@
 
 var
   gulp = require('gulp'),
-  gutil = require('gulp-util'),
   jasmine = require('gulp-jasmine'),
   jasmineReporters = require('jasmine-reporters'),
   config = require('../config'),
@@ -28,7 +27,7 @@ var
 
 gulp.task('_unit', function () {
   return gulp
-    .src(gutil.env.test || SRC.unit_test)
+    .src(SRC.unit_test)
     .pipe(jasmine({
       reporter: [terminalReporter,junitReporter],
       verbose: true,
