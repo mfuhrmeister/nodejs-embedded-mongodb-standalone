@@ -44,6 +44,7 @@ describe('mongodbDownload', function () {
   var
     underTest,
     downloadToFile,
+    getLinuxDistroSuffix,
     fsMock,
     httpsMock,
     getosMock;
@@ -73,6 +74,7 @@ describe('mongodbDownload', function () {
     underTest.__set__('getos', getosMock);
 
     downloadToFile = underTest.__get__('downloadToFile');
+    getLinuxDistroSuffix = underTest.__get__('getLinuxDistroSuffix');
   });
 
   it('should be defined', function () {
@@ -191,6 +193,55 @@ describe('mongodbDownload', function () {
 
   describe('mongodbDownload', function () {
 
+    describe('getLinuxDistroSuffix', function () {
+
+      function mockOsInfo(err, osInfo) {
+        getosMock.and.callFake(function (callback) {
+          callback(err, osInfo);
+        });
+      }
+
+      it('should resolve ubuntu 22 to the ubuntu1404 suffix', async function () {
+        mockOsInfo(null, {
+          dist: 'Ubuntu',
+          release: '22.04'
+        });
+
+        expect(await getLinuxDistroSuffix()).toEqual('-ubuntu1404');
+      });
+
+      it('should resolve elementary OS to the ubuntu1404 suffix', async function () {
+        mockOsInfo(null, {
+          dist: 'elementary OS',
+          release: '7.1'
+        });
+
+        expect(await getLinuxDistroSuffix()).toEqual('-ubuntu1404');
+      });
+
+      it('should resolve fedora 20 to the rhel70 suffix', async function () {
+        mockOsInfo(null, {
+          dist: 'Fedora',
+          release: '20'
+        });
+
+        expect(await getLinuxDistroSuffix()).toEqual('-rhel70');
+      });
+
+      it('should reject when getos fails', async function () {
+        var expectedError = new Error('os detection failed');
+
+        mockOsInfo(expectedError);
+
+        try {
+          await getLinuxDistroSuffix();
+          throw new Error('Expected getLinuxDistroSuffix to reject');
+        } catch (err) {
+          expect(err).toBe(expectedError);
+        }
+      });
+    });
+
     it('should reject if version is missing', async function () {
       try {
         await underTest({
@@ -216,6 +267,27 @@ describe('mongodbDownload', function () {
       })).toEqual(expectedFile);
 
       expect(fsMock.promises.mkdir).toHaveBeenCalledWith(path.resolve('/tmp/downloads', 'mongodb-download'), { recursive: true });
+      expect(httpsMock.get).not.toHaveBeenCalled();
+    });
+
+    it('should include the linux distro suffix in the cached file path', async function () {
+      var expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-linux-x86_64-ubuntu1404-3.2.8.tgz');
+
+      fsMock.promises.stat.and.returnValue(Promise.resolve({}));
+      getosMock.and.callFake(function (callback) {
+        callback(null, {
+          dist: 'Ubuntu',
+          release: '20.04'
+        });
+      });
+
+      expect(await underTest({
+        version: '3.2.8',
+        platform: 'linux',
+        arch: 'x64',
+        download_dir: '/tmp/downloads'
+      })).toEqual(expectedFile);
+
       expect(httpsMock.get).not.toHaveBeenCalled();
     });
   });
