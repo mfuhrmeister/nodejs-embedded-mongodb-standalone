@@ -6,7 +6,6 @@ process.env.DEBUG = '*';
 var
   os = require('os'),
   logger = require('npmlog'),
-  sprintf = require('sprintf-js').sprintf,
   args = process.argv.splice(process.execArgv.length + 2),
   
   nems = require('../lib/nems'),
@@ -19,7 +18,7 @@ var
     'If no download directory is given, mongodb will be downloaded and extracted to the temporary folder of your OS.\n' +
     'If no version is given also, a default version will be downloaded and extracted.',
   MESSAGE_DEFAULTS = 'Using default configuration for download and extraction.',
-  MESSAGE_EXTRACTED = 'Extracted to %s .',
+  MESSAGE_EXTRACTED = 'Extracted to',
   MESSAGE_SUCCESS = 'Download and extraction completed.';
 
 function getDefaultVersion() {
@@ -46,7 +45,7 @@ var
 async function main() {
   try {
     var path = await nems.distribute(VERSION, DOWNLOAD_DIR);
-    logger.info(MODULE_NAME, sprintf(MESSAGE_EXTRACTED, path));
+    logger.info(MODULE_NAME, `${MESSAGE_EXTRACTED} ${path} .`);
     logger.info(MODULE_NAME, MESSAGE_SUCCESS);
   } catch (err) {
     logger.error(MODULE_NAME, err);

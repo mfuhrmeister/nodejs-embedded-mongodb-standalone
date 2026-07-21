@@ -2,8 +2,7 @@
 
 var
   os = require('os'),
-  rewire = require('rewire'),
-  sprintf = require('sprintf-js').sprintf;
+  rewire = require('rewire');
 
 describe('downloadServiceSpec', function () {
 
@@ -21,7 +20,7 @@ describe('downloadServiceSpec', function () {
     ANY_VALID_DATA = 'ANY_VALID_DATA',
     ANY_ERROR_MESSAGE = 'ANY_ERROR_MESSAGE',
     ANY_ERROR = new Error(ANY_ERROR_MESSAGE),
-    LOG_MESSAGE = 'Download mongodb %s to %s';
+    LOG_MESSAGE = 'Starting download of mongodb';
 
   beforeEach(function () {
     mongodbDownloadMock = jasmine.createSpy('mongodbDownload');
@@ -64,7 +63,7 @@ describe('downloadServiceSpec', function () {
     it('should call mongodbDownload and log with default download directory', function (done) {
       var
         EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: os.tmpdir()},
-        EXPECTED_LOG_MESSAGE = sprintf(LOG_MESSAGE, ANY_VALID_VERSION, os.tmpdir());
+        EXPECTED_LOG_MESSAGE = `${LOG_MESSAGE} ${ANY_VALID_VERSION} to a mongodb-download directory under ${os.tmpdir()}`;
 
       underTest.download(ANY_VALID_VERSION).then(function () {
         expect(mongodbDownloadMock).toHaveBeenCalledWith(EXPECTED_OPTIONS);
@@ -76,7 +75,7 @@ describe('downloadServiceSpec', function () {
     it('should call mongodbDownload with download options', function (done) {
       var
         EXPECTED_OPTIONS = {version: ANY_VALID_VERSION, download_dir: ANY_DOWNLOAD_DIR},
-        EXPECTED_LOG_MESSAGE = sprintf(LOG_MESSAGE, ANY_VALID_VERSION, ANY_DOWNLOAD_DIR);
+        EXPECTED_LOG_MESSAGE = `${LOG_MESSAGE} ${ANY_VALID_VERSION} to a mongodb-download directory under ${ANY_DOWNLOAD_DIR}`;
 
       underTest.download(ANY_VALID_VERSION, ANY_DOWNLOAD_DIR).then(function () {
         expect(mongodbDownloadMock).toHaveBeenCalledWith(EXPECTED_OPTIONS);

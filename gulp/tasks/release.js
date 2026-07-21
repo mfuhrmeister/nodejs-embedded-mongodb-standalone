@@ -2,11 +2,10 @@
 
 var
   gulp = require('gulp'),
-  exec = require('child_process').exec,
-  sprintf = require('sprintf-js').sprintf;
+  exec = require('child_process').exec;
 
 function release(version, cb) {
-  exec(sprintf('npm version %s -m "release (nems): v%s" && npm publish', version, '%s'), function (err) {
+  exec(`npm version ${version} -m "release (nems): v%s" && npm publish`, function (err) {
     cb(err);
   });
 }

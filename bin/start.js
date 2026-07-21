@@ -6,7 +6,6 @@ process.env.DEBUG = '*';
 var
   os = require('os'),
   logger = require('npmlog'),
-  sprintf = require('sprintf-js').sprintf,
   args = process.argv.splice(process.execArgv.length + 2),
   
   nems = require('../lib/nems'),
@@ -24,7 +23,7 @@ var
     'If no download directory is given, mongodb will be downloaded and extracted to the temporary folder of your OS.\n' +
     'If no version is given also, a default version will be downloaded and extracted.',
   MESSAGE_DEFAULTS = 'Using default configuration for download and extraction.',
-  MESSAGE_STARTED = 'mongod started with pid %s .';
+  MESSAGE_STARTED = 'mongod started with pid';
 
 function getDefaultVersion() {
   if (os.platform() === 'darwin' && os.arch() === 'arm64') {
@@ -54,7 +53,7 @@ var
 async function main() {
   try {
     var pid = await nems.start(VERSION, DOWNLOAD_DIR, PORT, NOPREALLOC, NOJOURNAL, DB_PATH);
-    logger.info(MODULE_NAME, sprintf(MESSAGE_STARTED, pid));
+    logger.info(MODULE_NAME, `${MESSAGE_STARTED} ${pid} .`);
   } catch (err) {
     logger.error(MODULE_NAME, err.message);
   }
