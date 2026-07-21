@@ -1,7 +1,6 @@
 'use strict';
 
-const
-  rewire = require('rewire');
+const createNems = require('../../lib/nems.js').createNems;
 
 describe('index', function () {
 
@@ -20,8 +19,6 @@ describe('index', function () {
     ANY_PID = 'ANY_PID';
 
   beforeEach(function () {
-    underTest = rewire('../../lib/nems.js');
-
     downloadServiceMock = jasmine.createSpyObj('downloadService', ['download']);
     downloadServiceMock.download.and.returnValue(Promise.resolve(ANY_FILE));
 
@@ -32,9 +29,11 @@ describe('index', function () {
     mongoServiceMock.start.and.returnValue(Promise.resolve(ANY_PID));
     mongoServiceMock.stop.and.returnValue(Promise.resolve());
 
-    underTest.__set__('downloadService', downloadServiceMock);
-    underTest.__set__('extractionService', extractionServiceMock);
-    underTest.__set__('mongoService', mongoServiceMock);
+    underTest = createNems({
+      downloadService: downloadServiceMock,
+      extractionService: extractionServiceMock,
+      mongoService: mongoServiceMock
+    });
   });
 
   it('should be defined', function () {
