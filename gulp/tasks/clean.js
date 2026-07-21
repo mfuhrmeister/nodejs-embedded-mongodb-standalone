@@ -2,8 +2,10 @@
 
 var
   gulp = require('gulp'),
-  del = require('del');
+  loadDel = Function('specifier', 'return import(specifier);');
 
-gulp.task('_clean', function (done) {
-  return del(['./target'], done);
+gulp.task('_clean', function () {
+  return loadDel('del').then(function (delModule) {
+    return delModule.deleteAsync(['./target']);
+  });
 });
