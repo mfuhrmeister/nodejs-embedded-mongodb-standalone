@@ -32,7 +32,7 @@
 
 ### Phase 2: Module Conversion
 
-- [ ] Decide whether to use package-wide `"type": "module"` or a narrower `.mjs` migration strategy
+- [x] Decide to use package-wide `"type": "module"` for a future major release instead of a narrower `.mjs` migration strategy
 - [ ] Convert `require(...)` and `module.exports` usage to `import` and `export`
 - [ ] Replace `__dirname` and `__filename` usage in scripts with `import.meta.url` equivalents where needed
 - [ ] Update CLI entrypoints under `bin/` for ESM-compatible imports and execution
