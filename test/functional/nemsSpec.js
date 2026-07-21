@@ -1,6 +1,7 @@
-'use strict';
+import nems from '../../lib/nems.js';
+import testUtil from '../testUtil.js';
+
 const
-  testUtil = require('../testUtil.js'),
   ANY_VERSION = '3.2.8',
   ANY_DOWNLOAD_PATH_WITH_SPACE = 'test folder',
   ANY_DB_PATH_WITH_SPACE = 'test folder',
@@ -18,8 +19,7 @@ xdescribe('nems', function () {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
     testUtil.createFolder(ANY_DOWNLOAD_PATH_WITH_SPACE);
-
-    underTest = require('../../lib/nems.js');
+    underTest = nems;
   });
 
   afterEach(function () {

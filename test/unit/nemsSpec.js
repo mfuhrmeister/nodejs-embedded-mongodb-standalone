@@ -1,6 +1,4 @@
-'use strict';
-
-const createNems = require('../../lib/nems.js').createNems;
+import { createNems } from '../../lib/nems.js';
 
 describe('index', function () {
 

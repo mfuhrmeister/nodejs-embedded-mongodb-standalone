@@ -1,10 +1,9 @@
-'use strict';
+import os from 'os';
+import path from 'path';
+
+import { createExtractionService } from '../../../lib/distributer/extractionService.js';
 
 const
-  os = require('os'),
-  path = require('path'),
-  createExtractionService = require('../../../lib/distributer/extractionService.js').createExtractionService,
-
   ANY_VALID_FILE = 'ANY_VALID_FILE.zip',
   ANY_VALID_TAR_FILE = 'ANY_VALID_FILE.tar',
   ANY_VALID_TGZ_FILE = 'ANY_VALID_FILE.tgz',

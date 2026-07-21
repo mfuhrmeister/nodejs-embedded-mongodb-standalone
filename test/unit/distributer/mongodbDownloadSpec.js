@@ -1,9 +1,7 @@
-'use strict';
+import events from 'events';
+import path from 'path';
 
-const
-  events = require('events'),
-  path = require('path'),
-  createMongodbDownload = require('../../../lib/distributer/mongodbDownload.js').createMongodbDownload;
+import { createMongodbDownload } from '../../../lib/distributer/mongodbDownload.js';
 
 function createFileStreamMock() {
   const stream = new events.EventEmitter();

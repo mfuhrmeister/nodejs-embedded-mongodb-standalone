@@ -1,9 +1,6 @@
-'use strict';
-
-const
-  path = require('path'),
-  Jasmine = require('jasmine'),
-  jasmineReporters = require('jasmine-reporters');
+import path from 'path';
+import Jasmine from 'jasmine';
+import jasmineReporters from 'jasmine-reporters';
 
 function createTerminalReporter() {
   return new jasmineReporters.TerminalReporter({

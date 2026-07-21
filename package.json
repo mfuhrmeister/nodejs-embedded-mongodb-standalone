@@ -33,10 +33,11 @@
     "release:patch": "npm version patch -m \"release (nems): v%s\" && npm publish",
     "release:minor": "npm version minor -m \"release (nems): v%s\" && npm publish",
     "release:major": "npm version major -m \"release (nems): v%s\" && npm publish",
-    "dax": "node bin/dax",
-    "start": "node bin/start",
-    "stop": "node bin/stop"
+    "dax": "node bin/dax.js",
+    "start": "node bin/start.js",
+    "stop": "node bin/stop.js"
   },
+  "type": "module",
   "engines": {
     "node": ">=18"
   },

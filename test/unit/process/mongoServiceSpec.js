@@ -1,11 +1,10 @@
-'use strict';
+import events from 'events';
+import path from 'path';
+
+import { createMongoService } from '../../../lib/process/mongoService.js';
+import testUtil from '../../testUtil.js';
 
 const
-  createMongoService = require('../../../lib/process/mongoService.js').createMongoService,
-  events = require('events'),
-  path = require('path'),
-  testUtil = require('../../testUtil.js'),
-
   MONGOD_COMMAND = 'mongod',
   PARAMETER_DBPATH = '--dbpath',
   PARAMETER_PORT = '--port',

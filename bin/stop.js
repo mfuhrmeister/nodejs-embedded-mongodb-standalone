@@ -1,12 +1,11 @@
 /** stops a mongodb with given db path **/
 
+import logger from '../lib/logger.js';
+import nems from '../lib/nems.js';
+
 const
-  logger = require('../lib/logger'),
   args = process.argv.splice(process.execArgv.length + 2),
-
-  nems = require('../lib/nems'),
-
-  MODULE_NAME = require('../package.json').name,
+  MODULE_NAME = 'nems',
   MESSAGE_START = 'Stopping mongodb!',
   MESSAGE_USAGE = 'Usage:\n\nnode ./bin/stop.js [binPath [dbpath]]\n\n' +
     'binPath - the mongo installation path\n\n' +

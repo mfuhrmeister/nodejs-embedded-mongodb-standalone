@@ -1,8 +1,8 @@
-'use strict';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const fs = require('fs');
-const path = require('path');
-
-const TARGET_DIR = path.resolve(__dirname, '..', 'target');
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
+const TARGET_DIR = path.resolve(currentDir, '..', 'target');
 
 fs.rmSync(TARGET_DIR, { recursive: true, force: true });

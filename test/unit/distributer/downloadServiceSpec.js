@@ -1,8 +1,6 @@
-'use strict';
+import os from 'os';
 
-const
-  os = require('os'),
-  createDownloadService = require('../../../lib/distributer/downloadService').createDownloadService;
+import { createDownloadService } from '../../../lib/distributer/downloadService.js';
 
 describe('downloadServiceSpec', function () {
 

@@ -3,14 +3,13 @@
 // toogle debug output for mongodb-download
 process.env.DEBUG = '*';
 
+import os from 'os';
+import logger from '../lib/logger.js';
+import nems from '../lib/nems.js';
+
 const
-  os = require('os'),
-  logger = require('../lib/logger'),
   args = process.argv.splice(process.execArgv.length + 2),
-
-  nems = require('../lib/nems'),
-
-  MODULE_NAME = require('../package.json').name,
+  MODULE_NAME = 'nems',
   MESSAGE_START = 'Starting distribution and execution of mongodb!',
   MESSAGE_USAGE = 'Usage:\n\nnode ./bin/start.js [version [dir [port [noprealloc [nojournal [dbpath]]]]]]\n\n' +
     'version - the version of the mongodb\n' +

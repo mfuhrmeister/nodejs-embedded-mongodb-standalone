@@ -1,14 +1,11 @@
-'use strict';
-
-const
-  DownloadError = require('../../../lib/error/errors').DownloadError,
-  WriteError = require('../../../lib/error/errors').WriteError,
-  ExtractionError = require('../../../lib/error/errors').ExtractionError;
+import {
+  DownloadError,
+  WriteError,
+  ExtractionError
+} from '../../../lib/error/errors.js';
+import underTest from '../../../lib/error/errorHandler.js';
 
 describe('errorHandler', function () {
-
-  const underTest = require('../../../lib/error/errorHandler');
-
   it('should be defined', function () {
     expect(underTest).toBeDefined();
   });
@@ -17,7 +14,7 @@ describe('errorHandler', function () {
     const thrownError = {message: 'any error', statusCode: 401};
     try {
       underTest.handleDownloadError(thrownError);
-    } catch(err) {
+    } catch (err) {
       expect(err).toEqual(jasmine.any(DownloadError));
     }
   });
@@ -26,7 +23,7 @@ describe('errorHandler', function () {
     const thrownError = {message: 'any error', statusCode: 500};
     try {
       underTest.handleWriteError(thrownError);
-    } catch(err) {
+    } catch (err) {
       expect(err).toEqual(jasmine.any(WriteError));
     }
   });
@@ -35,7 +32,7 @@ describe('errorHandler', function () {
     const thrownError = {message: 'any error', statusCode: 500};
     try {
       underTest.handleExtractionError(thrownError);
-    } catch(err) {
+    } catch (err) {
       expect(err).toEqual(jasmine.any(ExtractionError));
     }
   });
@@ -45,9 +42,8 @@ describe('errorHandler', function () {
     const thrownError = new WriteError();
     try {
       underTest.handleDownloadError(thrownError);
-    } catch(err) {
+    } catch (err) {
       expect(err).toBe(thrownError);
     }
   });
-})
-;
+});

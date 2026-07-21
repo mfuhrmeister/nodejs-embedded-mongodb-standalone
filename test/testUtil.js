@@ -1,7 +1,4 @@
-'use strict';
-
-const
-  fs = require('fs');
+import fs from 'fs';
 
 function mkdir(path) {
   fs.mkdirSync(path, { recursive: true });
@@ -21,7 +18,12 @@ function escapePath(dbPath) {
   return '"' + dbPath + '"';
 }
 
-module.exports.createFolder = mkdir;
-module.exports.deleteFolder = rm;
-module.exports.killProcess = killProcess;
-module.exports.escapePath = escapePath;
+const testUtil = {
+  createFolder: mkdir,
+  deleteFolder: rm,
+  killProcess: killProcess,
+  escapePath: escapePath
+};
+
+export { mkdir as createFolder, rm as deleteFolder, killProcess, escapePath };
+export default testUtil;

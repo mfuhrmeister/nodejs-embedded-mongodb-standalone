@@ -13,7 +13,7 @@
 
 - [x] Replace remaining `var` declarations with `const` and `let` where appropriate
 - [x] Simplify small helper functions with modern JavaScript syntax where it improves readability
-- [x] Keep the project in CommonJS unless there is a strong reason to migrate to ESM
+- [x] Migrate the project from CommonJS to package-wide ESM for the major release path
 - [x] Evaluate whether Gulp can be replaced with plain npm scripts or small Node-based task runners
 - [x] Remove the remaining Gulp-specific files and dependency if they are no longer needed
 
@@ -21,7 +21,7 @@
 
 ### Phase 1: Testing And Seams
 
-- [x] Decide whether ESM is still worth the migration cost compared to keeping CommonJS for now
+- [x] Decide that package-wide ESM is worth the migration cost for the planned major release
 - [x] Keep Jasmine unless there is a strong reason to migrate the test runner separately
 - [x] Remove `rewire`-style testing from the unit suite before changing module format
 - [x] Refactor `lib/nems.js` to use explicit dependency seams instead of test-time module replacement
@@ -32,11 +32,11 @@
 
 ### Phase 2: Module Conversion
 
-- [x] Decide to use package-wide `"type": "module"` for a future major release instead of a narrower `.mjs` migration strategy
-- [ ] Convert `require(...)` and `module.exports` usage to `import` and `export`
-- [ ] Replace `__dirname` and `__filename` usage in scripts with `import.meta.url` equivalents where needed
-- [ ] Update CLI entrypoints under `bin/` for ESM-compatible imports and execution
-- [ ] Update helper scripts under `scripts/` for ESM-compatible path handling and imports
+- [x] Decide to use package-wide `"type": "module"` instead of a narrower `.mjs` migration strategy
+- [x] Convert `require(...)` and `module.exports` usage to `import` and `export`
+- [x] Replace `__dirname` and `__filename` usage in scripts with `import.meta.url` equivalents where needed
+- [x] Update CLI entrypoints under `bin/` for ESM-compatible imports and execution
+- [x] Update helper scripts under `scripts/` for ESM-compatible path handling and imports
 
 ### Phase 3: Verification And Docs
 

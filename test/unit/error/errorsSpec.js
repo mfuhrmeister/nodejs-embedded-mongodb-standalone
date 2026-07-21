@@ -1,8 +1,6 @@
-'use strict';
+import * as errors from '../../../lib/error/errors.js';
 
 describe('errors', function () {
-  const errors = require('../../../lib/error/errors.js');
-
   it('should be defined', function () {
     expect(errors).toBeDefined();
   });
@@ -12,13 +10,13 @@ describe('errors', function () {
 
       let error;
 
-      beforeEach(function() {
+      beforeEach(function () {
         error = new errors[expectedErrorObject.name](expectedErrorObject.message);
       });
 
-      describe('properties', function() {
+      describe('properties', function () {
 
-        it('should be defined appropriately', function() {
+        it('should be defined appropriately', function () {
           expect(error.name).toBe(expectedErrorObject.name);
           expect(error.message).toBe(expectedErrorObject.message);
           expect(error.statusCode).toBe(expectedErrorObject.statusCode);
@@ -53,28 +51,28 @@ describe('errors', function () {
 
   const expectedErrors = [
     {
-      name : 'DownloadError',
+      name: 'DownloadError',
       message: 'Download went wrong!',
       statusCode: 404
     },
     {
-      name : 'WriteError',
+      name: 'WriteError',
       message: 'Writing file went wrong!',
       statusCode: 500
     },
     {
-      name : 'ExtractionError',
+      name: 'ExtractionError',
       message: 'Extracting file went wrong!',
       statusCode: 500
     },
     {
-      name : 'MongoError',
+      name: 'MongoError',
       message: 'Starting mongo process went wrong!',
       statusCode: 500
     }
   ];
 
-  expectedErrors.forEach(function(errorObject) {
+  expectedErrors.forEach(function (errorObject) {
     testError(errorObject);
   });
 });
