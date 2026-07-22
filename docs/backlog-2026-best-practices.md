@@ -6,12 +6,12 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 
 ## Priority 1: Runtime Hardening
 
-- [ ] Replace shell-based `child_process.exec(...)` usage with `spawn(...)` or `execFile(...)` plus explicit argv arrays in `lib/process/mongoService.js`
-- [ ] Stop building `mongod` commands through string concatenation in `lib/process/mongoService.js`
-- [ ] Add startup and shutdown timeouts in `lib/process/mongoService.js` so hung processes fail deterministically
-- [ ] Clean up `stdout` and `stderr` listeners after resolve or reject in `lib/process/mongoService.js`
-- [ ] Keep PID-file shutdown as the primary path, but make fallback shutdown behavior explicit and bounded in `lib/process/mongoService.js`
-- [ ] Add tests for paths containing quotes or shell metacharacters in `test/unit/process/mongoServiceSpec.js`
+- [x] Replace shell-based `child_process.exec(...)` usage with `spawn(...)` or `execFile(...)` plus explicit argv arrays in `lib/process/mongoService.js`
+- [x] Stop building `mongod` commands through string concatenation in `lib/process/mongoService.js`
+- [x] Add startup and shutdown timeouts in `lib/process/mongoService.js` so hung processes fail deterministically
+- [x] Clean up `stdout` and `stderr` listeners after resolve or reject in `lib/process/mongoService.js`
+- [x] Keep PID-file shutdown as the primary path, but make fallback shutdown behavior explicit and bounded in `lib/process/mongoService.js`
+- [x] Add tests for paths containing quotes or shell metacharacters in `test/unit/process/mongoServiceSpec.js`
 
 ## Priority 2: Download And Extraction Security
 
@@ -79,4 +79,3 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 - Keep changes incremental and testable; the highest-risk files are `lib/process/mongoService.js`, `lib/distributer/mongodbDownload.js`, and `lib/distributer/extractionService.js`.
 - After finishing each Priority task list, evaluate what release type (patch/minor/major) is appropriate.
 - After finishing each Priority task list, give a command list for releasing on github and npmjs.org.
-

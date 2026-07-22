@@ -2,7 +2,6 @@ import events from 'events';
 import path from 'path';
 
 import { createMongoService } from '../../../lib/process/mongoService.js';
-import testUtil from '../../testUtil.js';
 
 const
   MONGOD_COMMAND = 'mongod',
@@ -14,15 +13,15 @@ const
   PARAMETER_SHUTDOWN = '--shutdown',
 
   ANY_BIN_PATH = 'ANY_BIN_PATH',
+  ANY_BIN_PATH_WITH_SPECIALS = 'ANY_BIN_PATH "quoted" & unsafe',
   ANY_DB_PATH = 'ANY_DB_PATH',
+  ANY_DB_PATH_WITH_SPECIALS = 'ANY_DB_PATH "quoted" & unsafe',
   ANY_PORT = 'ANY_PORT',
   ANY_PID = 12356,
   ANY_PID_FILE_PATH = path.join(ANY_BIN_PATH, 'mongod.pid'),
   ANY_DB_PID_FILE_PATH = path.join(ANY_DB_PATH, 'mongod.pid'),
 
   ANY_ERROR = 'ANY_ERROR',
-  ANY_MONGO_ERROR = 'ANY_MONGO_ERROR',
-  ANY_MONGO_MESSAGE = 'ANY_MONGO_MESSAGE',
   MESSAGE_MONGO_WAITING = '[initandlisten] waiting for connections on port',
   MESSAGE_MONGO_WAITING_MODERN = '"msg":"Waiting for connections"',
   MESSAGE_MONGO_KILLING_PROCESS = 'killing process with pid',
@@ -35,6 +34,8 @@ const
 
   ERROR_MESSAGE_MONGO_START_FAILED = 'could not start mongo process: ',
   ERROR_MESSAGE_MONGO_SHUTDOWN = 'could not create child process to stop mongo process',
+  ERROR_MESSAGE_MONGO_START_TIMEOUT = 'could not start mongo process: startup timed out',
+  ERROR_MESSAGE_MONGO_SHUTDOWN_TIMEOUT = 'could not stop mongo process: shutdown timed out',
   ERROR_MESSAGE_MONGO_INSTANCE_EXIST = 'Is a mongod instance already running?',
   ERROR_MESSAGE_MONGO_BAD_PORT = 'The port you used is not allowed. See mongodb docs.',
   ERROR_MESSAGE_MONGO_ADDR_IN_USE  = 'The port you used is already in use.',
@@ -46,24 +47,63 @@ function createErrorWithCode(message, code) {
   return err;
 }
 
+function createTimersMock() {
+  const timers = new Map();
+  let nextId = 1;
+  let lastTimerId;
+
+  return {
+    setTimeout: jasmine.createSpy('setTimeout').and.callFake(function (callback, delay) {
+      const timerId = nextId;
+      nextId += 1;
+      lastTimerId = timerId;
+      timers.set(timerId, {callback: callback, delay: delay});
+      return timerId;
+    }),
+    clearTimeout: jasmine.createSpy('clearTimeout').and.callFake(function (timerId) {
+      timers.delete(timerId);
+    }),
+    runTimer: function (timerId) {
+      const timer = timers.get(timerId);
+
+      if (timer) {
+        timers.delete(timerId);
+        timer.callback();
+      }
+    },
+    runLastTimer: function () {
+      if (lastTimerId !== undefined) {
+        this.runTimer(lastTimerId);
+      }
+    }
+  };
+}
+
 describe('mongoService', function () {
 
   let
     underTest,
+    spawnResult,
     stdoutEventEmitter,
     stderrEventEmitter,
     childProcessMock,
     fsMock,
     processMock,
-    loggerMock,
-    state;
+    state,
+    timersMock;
 
   beforeEach(function () {
     stderrEventEmitter = new events.EventEmitter();
     stdoutEventEmitter = new events.EventEmitter();
 
-    childProcessMock = jasmine.createSpyObj('childProcess', ['exec']);
-    childProcessMock.exec.and.returnValue({pid: ANY_PID, stderr: stderrEventEmitter, stdout: stdoutEventEmitter});
+    spawnResult = new events.EventEmitter();
+    spawnResult.pid = ANY_PID;
+    spawnResult.stderr = stderrEventEmitter;
+    spawnResult.stdout = stdoutEventEmitter;
+    spawnResult.kill = jasmine.createSpy('spawnResult.kill');
+
+    childProcessMock = jasmine.createSpyObj('childProcess', ['spawn']);
+    childProcessMock.spawn.and.returnValue(spawnResult);
 
     fsMock = {
       promises: {
@@ -74,8 +114,7 @@ describe('mongoService', function () {
     };
 
     processMock = jasmine.createSpyObj('process', ['kill']);
-
-    loggerMock = jasmine.createSpyObj('logger', ['info']);
+    timersMock = createTimersMock();
 
     state = {
       mongoProcess: undefined
@@ -85,8 +124,12 @@ describe('mongoService', function () {
       childProcess: childProcessMock,
       fs: fsMock,
       process: processMock,
-      logger: loggerMock,
-      state: state
+      state: state,
+      timers: timersMock,
+      timeouts: {
+        startupMs: 10,
+        shutdownMs: 20
+      }
     });
   });
 
@@ -100,7 +143,7 @@ describe('mongoService', function () {
     describe('child process execution', function () {
 
       it('should reject when anything throws', function (done) {
-        childProcessMock.exec.and.throwError(ANY_ERROR);
+        childProcessMock.spawn.and.throwError(ANY_ERROR);
 
         underTest.start().then(function () {
           done.fail('reject when anything throws should have been caught');
@@ -111,12 +154,12 @@ describe('mongoService', function () {
       });
 
       function testStartChildProcess(test) {
-        it('should call exec on child_process with command ' + test.command, function (done) {
+        it('should call spawn on child_process with command ' + test.command, function (done) {
           underTest.start.apply(this, test.params).then(function () {
-            expect(childProcessMock.exec.calls.argsFor(0)[0]).toEqual(test.command);
+            expect(childProcessMock.spawn.calls.argsFor(0)).toEqual([test.command, test.args]);
             done();
           }).catch(function () {
-            done.fail('exec child process with command ' + test.command + ' should have been resolved');
+            done.fail('spawn child process with command ' + test.command + ' should have been resolved');
           });
 
           stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
@@ -124,27 +167,36 @@ describe('mongoService', function () {
       }
 
       [
-        { params: null, command: MONGOD_COMMAND},
+        { params: null, command: MONGOD_COMMAND, args: []},
         { params: [ANY_BIN_PATH],
-          command: [
-            testUtil.escapePath(path.join(ANY_BIN_PATH, MONGOD_COMMAND)),
+          command: path.join(ANY_BIN_PATH, MONGOD_COMMAND),
+          args: [
             PARAMETER_DBPATH,
-            testUtil.escapePath(ANY_BIN_PATH),
+            ANY_BIN_PATH,
             PARAMETER_PIDFILE,
-            testUtil.escapePath(ANY_PID_FILE_PATH)
-          ].join(' ')
+            ANY_PID_FILE_PATH
+          ]
         },
-        { params: [null, ANY_PORT], command: [MONGOD_COMMAND, PARAMETER_PORT, ANY_PORT].join(' ')},
-        { params: [null, null, true], command: [MONGOD_COMMAND, PARAMETER_NOPREALLOC].join(' ')},
-        { params: [null, null, false, true], command: [MONGOD_COMMAND, PARAMETER_NOJOURNAL].join(' ')},
+        { params: [null, ANY_PORT], command: MONGOD_COMMAND, args: [PARAMETER_PORT, ANY_PORT]},
+        { params: [null, null, true], command: MONGOD_COMMAND, args: [PARAMETER_NOPREALLOC]},
+        { params: [null, null, false, true], command: MONGOD_COMMAND, args: [PARAMETER_NOJOURNAL]},
         { params: [null, null, false, false, ANY_DB_PATH],
-          command: [
-            MONGOD_COMMAND,
+          command: MONGOD_COMMAND,
+          args: [
             PARAMETER_DBPATH,
-            testUtil.escapePath(ANY_DB_PATH),
+            ANY_DB_PATH,
             PARAMETER_PIDFILE,
-            testUtil.escapePath(ANY_DB_PID_FILE_PATH)
-          ].join(' ')
+            ANY_DB_PID_FILE_PATH
+          ]
+        },
+        { params: [ANY_BIN_PATH_WITH_SPECIALS, null, false, false, ANY_DB_PATH_WITH_SPECIALS],
+          command: path.join(ANY_BIN_PATH_WITH_SPECIALS, MONGOD_COMMAND),
+          args: [
+            PARAMETER_DBPATH,
+            ANY_DB_PATH_WITH_SPECIALS,
+            PARAMETER_PIDFILE,
+            path.join(ANY_DB_PATH_WITH_SPECIALS, 'mongod.pid')
+          ]
         }
       ].forEach(testStartChildProcess);
     });
@@ -173,6 +225,18 @@ describe('mongoService', function () {
         });
 
         stderrEventEmitter.emit('data', ANY_ROOT_CAUSE_MESSAGE);
+      });
+
+      it('should reject when startup times out', function (done) {
+        underTest.start().then(function () {
+          done.fail('reject when startup times out should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_START_TIMEOUT));
+          expect(spawnResult.kill).toHaveBeenCalledWith('SIGTERM');
+          done();
+        });
+
+        timersMock.runLastTimer();
       });
 
       it('should reject on mongo may be already started', function (done) {
@@ -234,6 +298,21 @@ describe('mongoService', function () {
 
         stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING_MODERN);
       });
+
+      it('should clean up startup listeners after resolve', function (done) {
+        underTest.start().then(function () {
+          expect(stdoutEventEmitter.listenerCount('data')).toBe(0);
+          expect(stderrEventEmitter.listenerCount('data')).toBe(0);
+          expect(spawnResult.listenerCount('error')).toBe(0);
+          expect(spawnResult.listenerCount('close')).toBe(0);
+          expect(timersMock.clearTimeout).toHaveBeenCalled();
+          done();
+        }).catch(function () {
+          done.fail('startup listener cleanup should have been resolved');
+        });
+
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
+      });
     });
   });
 
@@ -246,7 +325,7 @@ describe('mongoService', function () {
       });
 
       it('should reject when anything throws', function (done) {
-        childProcessMock.exec.and.throwError(ANY_ERROR);
+        childProcessMock.spawn.and.throwError(ANY_ERROR);
 
         underTest.stop().then(function () {
           done.fail('reject when anything throws should have been caught');
@@ -257,7 +336,7 @@ describe('mongoService', function () {
       });
 
       it('should reject when child process creation failed', function (done) {
-        childProcessMock.exec.and.returnValue(undefined);
+        childProcessMock.spawn.and.returnValue(undefined);
 
         underTest.stop().then(function () {
           done.fail('reject when child process creation failed should have been caught');
@@ -275,7 +354,23 @@ describe('mongoService', function () {
           done();
         });
 
-        stderrEventEmitter.emit('data', MESSAGE_MONGO_UNKNOWN_DB_PATH);
+        setImmediate(function () {
+          stderrEventEmitter.emit('data', MESSAGE_MONGO_UNKNOWN_DB_PATH);
+        });
+      });
+
+      it('should reject when shutdown times out', function (done) {
+        underTest.stop().then(function () {
+          done.fail('reject when shutdown times out should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_SHUTDOWN_TIMEOUT));
+          expect(spawnResult.kill).toHaveBeenCalledWith('SIGTERM');
+          done();
+        });
+
+        setImmediate(function () {
+          timersMock.runLastTimer();
+        });
       });
 
       it('should resolve on shutdown', function (done) {
@@ -286,7 +381,26 @@ describe('mongoService', function () {
           done.fail('shutdown should have been resolved');
         });
 
-        stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
+        setImmediate(function () {
+          stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
+        });
+      });
+
+      it('should clean up shutdown listeners after resolve', function (done) {
+        underTest.stop().then(function () {
+          expect(stdoutEventEmitter.listenerCount('data')).toBe(0);
+          expect(stderrEventEmitter.listenerCount('data')).toBe(0);
+          expect(spawnResult.listenerCount('error')).toBe(0);
+          expect(spawnResult.listenerCount('close')).toBe(0);
+          expect(timersMock.clearTimeout).toHaveBeenCalled();
+          done();
+        }).catch(function () {
+          done.fail('shutdown listener cleanup should have been resolved');
+        });
+
+        setImmediate(function () {
+          stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
+        });
       });
 
       it('should stop using pid file when available', function (done) {
@@ -296,10 +410,50 @@ describe('mongoService', function () {
           expect(message).toEqual(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
           expect(fsMock.promises.readFile).toHaveBeenCalledWith(ANY_PID_FILE_PATH, 'utf8');
           expect(processMock.kill).toHaveBeenCalledWith(ANY_PID, 'SIGTERM');
-          expect(childProcessMock.exec).not.toHaveBeenCalled();
+          expect(childProcessMock.spawn).not.toHaveBeenCalled();
           done();
         }).catch(function () {
           done.fail('stop using pid file when available should have been resolved');
+        });
+      });
+
+      it('should fall back to mongod shutdown when pid file is missing', function (done) {
+        underTest.stop(ANY_BIN_PATH).then(function (message) {
+          expect(message).toEqual(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
+          expect(fsMock.promises.readFile).toHaveBeenCalledWith(ANY_PID_FILE_PATH, 'utf8');
+          expect(childProcessMock.spawn).toHaveBeenCalledWith(path.join(ANY_BIN_PATH, MONGOD_COMMAND), [
+            PARAMETER_DBPATH,
+            ANY_BIN_PATH,
+            PARAMETER_SHUTDOWN
+          ]);
+          done();
+        }).catch(function () {
+          done.fail('fallback to mongod shutdown when pid file is missing should have been resolved');
+        });
+
+        setImmediate(function () {
+          stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
+        });
+      });
+
+      it('should fall back to mongod shutdown when pid file content is invalid', function (done) {
+        fsMock.promises.readFile.and.returnValue(Promise.resolve('not-a-pid'));
+
+        underTest.stop(ANY_BIN_PATH, ANY_DB_PATH).then(function (message) {
+          expect(message).toEqual(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
+          expect(processMock.kill).not.toHaveBeenCalled();
+          expect(childProcessMock.spawn).toHaveBeenCalledWith(path.join(ANY_BIN_PATH, MONGOD_COMMAND), [
+            PARAMETER_DBPATH,
+            ANY_DB_PATH,
+            PARAMETER_SHUTDOWN
+          ]);
+          done();
+        }).catch(function () {
+          done.fail('fallback to mongod shutdown when pid file content is invalid should have been resolved');
+        });
+
+        setImmediate(function () {
+          stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
         });
       });
 
@@ -318,12 +472,12 @@ describe('mongoService', function () {
       });
 
       function testStopChildProcess(test) {
-        it('should call exec on child_process with command ' + test.command, function (done) {
+        it('should call spawn on child_process with command ' + test.command, function (done) {
           underTest.stop.apply(this, test.params).then(function () {
-            expect(childProcessMock.exec.calls.argsFor(0)[0]).toEqual(test.command);
+            expect(childProcessMock.spawn.calls.argsFor(0)).toEqual([test.command, test.args]);
             done();
           }).catch(function () {
-            done.fail('exec child process with command ' + test.command + ' should have been resolved');
+            done.fail('spawn child process with command ' + test.command + ' should have been resolved');
           });
 
           setImmediate(function () {
@@ -333,21 +487,29 @@ describe('mongoService', function () {
       }
 
       [
-        { params: null, command: [MONGOD_COMMAND, PARAMETER_SHUTDOWN].join(' ')},
+        { params: null, command: MONGOD_COMMAND, args: [PARAMETER_SHUTDOWN]},
         { params: [ANY_BIN_PATH],
-          command: [
-            testUtil.escapePath(path.join(ANY_BIN_PATH, MONGOD_COMMAND)),
+          command: path.join(ANY_BIN_PATH, MONGOD_COMMAND),
+          args: [
             PARAMETER_DBPATH,
-            testUtil.escapePath(ANY_BIN_PATH),
+            ANY_BIN_PATH,
             PARAMETER_SHUTDOWN
-          ].join(' ')},
+          ]},
         { params: [ANY_BIN_PATH, ANY_DB_PATH],
-          command: [
-            testUtil.escapePath(path.join(ANY_BIN_PATH, MONGOD_COMMAND)),
+          command: path.join(ANY_BIN_PATH, MONGOD_COMMAND),
+          args: [
             PARAMETER_DBPATH,
-            testUtil.escapePath(ANY_DB_PATH),
+            ANY_DB_PATH,
             PARAMETER_SHUTDOWN
-          ].join(' ')}
+          ]}
+        ,
+        { params: [ANY_BIN_PATH_WITH_SPECIALS, ANY_DB_PATH_WITH_SPECIALS],
+          command: path.join(ANY_BIN_PATH_WITH_SPECIALS, MONGOD_COMMAND),
+          args: [
+            PARAMETER_DBPATH,
+            ANY_DB_PATH_WITH_SPECIALS,
+            PARAMETER_SHUTDOWN
+          ]}
       ].forEach(testStopChildProcess);
 
     });
