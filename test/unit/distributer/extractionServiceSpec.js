@@ -252,6 +252,36 @@ describe('extractionService', function () {
       });
     });
 
+    it('should reject tar symbolic links through the tar filter', function (done) {
+      underTest.extract(ANY_VALID_TAR_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
+        const options = tarMock.x.calls.argsFor(0)[0];
+        expect(options.filter('symlink-path', { type: 'SymbolicLink' })).toBe(false);
+        done();
+      }).catch(function () {
+        done.fail('tar symbolic link filtering should have been resolved');
+      });
+    });
+
+    it('should reject tar hard links through the tar filter', function (done) {
+      underTest.extract(ANY_VALID_TAR_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
+        const options = tarMock.x.calls.argsFor(0)[0];
+        expect(options.filter('hard-link-path', { type: 'Link' })).toBe(false);
+        done();
+      }).catch(function () {
+        done.fail('tar hard link filtering should have been resolved');
+      });
+    });
+
+    it('should allow regular tar file entries through the tar filter', function (done) {
+      underTest.extract(ANY_VALID_TAR_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
+        const options = tarMock.x.calls.argsFor(0)[0];
+        expect(options.filter('regular-file', { type: 'File' })).toBe(true);
+        done();
+      }).catch(function () {
+        done.fail('regular tar file filtering should have been resolved');
+      });
+    });
+
     it('should throw an error if arch type is invalid', function (done) {
       const file = [ANY_VALID_FILE_PATH, ANY_INVALID_ARCH_TYPE].join('.');
 
@@ -280,6 +310,20 @@ describe('extractionService', function () {
 
     it('should catch an extractZip error', function (done) {
       const expectedError = new Error('any extraction error');
+      extractZipMock.and.callFake(function () {
+        return Promise.reject(expectedError);
+      });
+
+      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
+        done.fail('Error should have been caught');
+      }).catch(function (err) {
+        expect(err).toEqual(expectedError);
+        done();
+      });
+    });
+
+    it('should propagate zip path traversal errors from extract-zip', function (done) {
+      const expectedError = new Error('Out of bound path "/tmp/escape" found while processing file ../../escape');
       extractZipMock.and.callFake(function () {
         return Promise.reject(expectedError);
       });
