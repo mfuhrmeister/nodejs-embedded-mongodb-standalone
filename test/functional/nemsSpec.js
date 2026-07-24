@@ -1,53 +1,103 @@
+import net from 'net';
+import os from 'os';
+import path from 'path';
+
 import nems from '../../lib/nems.js';
 import testUtil from '../testUtil.js';
 
 const
-  ANY_VERSION = '3.2.8',
-  ANY_DOWNLOAD_PATH_WITH_SPACE = 'test folder',
-  ANY_DB_PATH_WITH_SPACE = 'test folder',
+  SMOKE_TEST_ENABLED = process.env.NEMS_RUN_SMOKE === 'true',
+  describeWhenEnabled = SMOKE_TEST_ENABLED ? describe : xdescribe,
+  DEFAULT_SMOKE_VERSION = '6.0.8',
   SUCCESS_MESSAGE_MONGO_SHUTDOWN = 'The mongodb instance has been shutdown!';
 
-let
-  originalTimeout;
+function wait(ms) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, ms);
+  });
+}
 
-xdescribe('nems', function () {
+async function deleteFolderWithRetry(targetPath) {
+  let lastError;
 
-  let
-    underTest;
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    try {
+      testUtil.deleteFolder(targetPath);
+      return;
+    } catch (err) {
+      lastError = err;
+      await wait(250);
+    }
+  }
+
+  throw lastError;
+}
+
+function getFreePort() {
+  return new Promise(function (resolve, reject) {
+    const server = net.createServer();
+
+    server.on('error', reject);
+    server.listen(0, '127.0.0.1', function () {
+      const address = server.address();
+      const port = typeof address === 'object' && address ? address.port : undefined;
+
+      server.close(function (err) {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(port);
+      });
+    });
+  });
+}
+
+describeWhenEnabled('nems smoke', function () {
+  let originalTimeout;
 
   beforeEach(function () {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
-    testUtil.createFolder(ANY_DOWNLOAD_PATH_WITH_SPACE);
-    underTest = nems;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000;
   });
 
   afterEach(function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
   });
 
-  describe('start', function () {
-    it('should start a mongo with a space in the path to the bin folder', function (done) {
-      underTest.start(ANY_VERSION, ANY_DOWNLOAD_PATH_WITH_SPACE, undefined, undefined, undefined, ANY_DB_PATH_WITH_SPACE)
-        .then(function (pid) {
-          expect(pid).toBeDefined();
-          done();
-        }).catch(function (err) {
-          console.log(err);
-          done.fail('start with a space in the path to the bin folder should have been resolved');
-        });
-    });
-  });
+  it('should download extract start and stop mongo with spaces in paths', async function () {
+    const version = process.env.NEMS_SMOKE_VERSION || DEFAULT_SMOKE_VERSION;
+    const baseDir = path.join(os.tmpdir(), 'nems smoke test');
+    const downloadDir = path.join(baseDir, 'download dir');
+    const dbPath = path.join(baseDir, 'db path');
+    const port = await getFreePort();
+    let extractionPath;
+    let stopMessage;
 
-  describe('stop', function () {
-    it('should stop a mongo with a space in the path to the bin folder', function (done) {
-      underTest.stop(ANY_DB_PATH_WITH_SPACE).then(function (message) {
-          expect(message).toBe(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
-          done();
-        }).catch(function (err) {
-        console.log(err);
-        done.fail('stop with a space in the path to the bin folder should have been resolved');
-      });
-    });
+    await deleteFolderWithRetry(baseDir);
+    testUtil.createFolder(downloadDir);
+
+    try {
+      extractionPath = await nems.distribute(version, downloadDir);
+      expect(extractionPath).toContain(downloadDir);
+      expect(extractionPath).toContain(version);
+
+      const pid = await nems.startMongo(path.join(extractionPath, 'bin'), port, true, true, dbPath);
+      expect(pid).toBeDefined();
+
+      stopMessage = await nems.stop(path.join(extractionPath, 'bin'), dbPath);
+      expect(stopMessage).toEqual(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
+    } finally {
+      if (extractionPath && stopMessage !== SUCCESS_MESSAGE_MONGO_SHUTDOWN) {
+        try {
+          await nems.stop(path.join(extractionPath, 'bin'), dbPath);
+        } catch (err) {
+          // Best-effort cleanup so a failed smoke test does not leave mongod behind.
+        }
+      }
+
+      await deleteFolderWithRetry(baseDir);
+    }
   });
 });

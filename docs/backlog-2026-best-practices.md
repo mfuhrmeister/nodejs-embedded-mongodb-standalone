@@ -35,8 +35,8 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 
 ## Priority 4: Test And CI Confidence
 
-- [ ] Re-enable or replace the skipped functional suite in `test/functional/nemsSpec.js`
-- [ ] Add at least one CI-executed smoke path for download, extract, start, and stop behavior
+- [x] Re-enable or replace the skipped functional suite in `test/functional/nemsSpec.js`
+- [x] Add at least one CI-executed smoke path for download, extract, start, and stop behavior
 - [ ] Switch CircleCI from `npm install` to `npm ci` in `.circleci/config.yml`
 - [ ] Add a Node version matrix that covers Node 18 and the current LTS line in `.circleci/config.yml`
 - [ ] Add coverage reporting and a minimum threshold for critical modules

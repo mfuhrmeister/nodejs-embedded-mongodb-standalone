@@ -21,6 +21,9 @@ jobs:
       - run:
           name: Build
           command: npm run build
+      - run:
+          name: Run smoke test
+          command: NEMS_RUN_SMOKE=true npm run functional:smoke
 
 workflows:
   build_and_test:
