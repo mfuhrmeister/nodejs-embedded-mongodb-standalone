@@ -1,0 +1,1 @@
+- fix (cli): modernize default version and error handling
