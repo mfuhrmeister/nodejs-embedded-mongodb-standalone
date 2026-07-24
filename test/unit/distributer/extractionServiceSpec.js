@@ -14,6 +14,8 @@ const
   DEFAULT_EXTRACTION_DIR = 'mongodb-download',
   ERROR_MESSAGE_NO_FILE_FOR_EXTRACTION = 'missing file for extraction',
   ERROR_MESSAGE_NO_VERSION_FOR_EXTRACTION = 'missing version for extraction',
+  ERROR_MESSAGE_TAR_ENTRY_LIMIT_EXCEEDED = 'tar extraction limits exceeded: too many entries',
+  ERROR_MESSAGE_TAR_TOTAL_SIZE_LIMIT_EXCEEDED = 'tar extraction limits exceeded: total uncompressed size',
   ERROR_MESSAGE_ZIP_ENTRY_LIMIT_EXCEEDED = 'zip extraction limits exceeded: too many entries',
   ERROR_MESSAGE_ZIP_TOTAL_SIZE_LIMIT_EXCEEDED = 'zip extraction limits exceeded: total uncompressed size',
   ERROR_MESSAGE_ZIP_COMPRESSION_RATIO_LIMIT_EXCEEDED = 'zip extraction limits exceeded: compression ratio',
@@ -176,7 +178,9 @@ describe('extractionService', function () {
           strip: 1,
           gzip: false,
           preservePaths: false,
-          filter: jasmine.any(Function)
+          filter: jasmine.any(Function),
+          onReadEntry: jasmine.any(Function),
+          maxDecompressionRatio: 200
         }));
         done();
       });
@@ -192,8 +196,58 @@ describe('extractionService', function () {
           strip: 1,
           gzip: true,
           preservePaths: false,
-          filter: jasmine.any(Function)
+          filter: jasmine.any(Function),
+          onReadEntry: jasmine.any(Function),
+          maxDecompressionRatio: 200
         }));
+        done();
+      });
+    });
+
+    it('should reject when the tar entry count limit is exceeded', function (done) {
+      tarMock.x.and.callFake(function (options) {
+        options.onReadEntry({ size: 1 });
+        options.onReadEntry({ size: 1 });
+        return Promise.resolve();
+      });
+
+      underTest = createExtractionService({
+        extractZip: extractZipMock,
+        tar: tarMock,
+        ensureDir: ensureDirMock,
+        tarLimits: { maxEntries: 1 }
+      });
+
+      underTest.extract(ANY_VALID_TAR_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
+        done.fail('Error should have been caught');
+      }).catch(function (err) {
+        expect(err.name).toEqual('ExtractionError');
+        expect(err.message).toEqual(ERROR_MESSAGE_TAR_ENTRY_LIMIT_EXCEEDED);
+        expect(err.statusCode).toEqual(413);
+        done();
+      });
+    });
+
+    it('should reject when the total uncompressed tar size limit is exceeded', function (done) {
+      tarMock.x.and.callFake(function (options) {
+        options.onReadEntry({ size: 10 });
+        options.onReadEntry({ size: 1 });
+        return Promise.resolve();
+      });
+
+      underTest = createExtractionService({
+        extractZip: extractZipMock,
+        tar: tarMock,
+        ensureDir: ensureDirMock,
+        tarLimits: { maxTotalUncompressedBytes: 10 }
+      });
+
+      underTest.extract(ANY_VALID_TAR_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function () {
+        done.fail('Error should have been caught');
+      }).catch(function (err) {
+        expect(err.name).toEqual('ExtractionError');
+        expect(err.message).toEqual(ERROR_MESSAGE_TAR_TOTAL_SIZE_LIMIT_EXCEEDED);
+        expect(err.statusCode).toEqual(413);
         done();
       });
     });
