@@ -85,6 +85,10 @@ import nems from 'nems';
  *  dbpath - db working directory, if different from installation path (optional)
  * 
  */
+
+If `dbpath` is provided and the directory does not exist, nems creates it before starting `mongod`.
+
+Note on modern MongoDB versions: `--noprealloc` and `--nojournal` are legacy flags and can be rejected by newer `mongod` binaries. If `mongod` reports an unrecognized option for these flags, nems retries startup without them.
 nems.startMongo('path/to/mongodb/installation', 27017, true, true, 'path/to/db/working/directory')
   .then(function (pid) {
     // do anything with the returned process id
