@@ -1,0 +1,6 @@
+- f3e8bc9 docs (readme): document dbpath creation and legacy flag fallback
+- fd556df fix (mongoService): retry without deprecated mongod flags
+- 34a0b27 fix (mongoService): create dbpath before startup
+- 68862e2 fix (mongodbDownload): verify sha256 checksum after download
+- ed6955f fix (mongodbDownload): reject oversized downloads
+- c88f87c fix (mongodbDownload): bound redirects and clean temp files
