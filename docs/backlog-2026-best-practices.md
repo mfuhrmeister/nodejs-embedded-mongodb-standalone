@@ -15,7 +15,7 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 
 ## Priority 2: Download And Extraction Security
 
-- [ ] Add checksum verification for downloaded MongoDB archives in `lib/distributer/mongodbDownload.js`
+- [x] Add checksum verification for downloaded MongoDB archives in `lib/distributer/mongodbDownload.js`
 - [x] Enforce a redirect limit in `lib/distributer/mongodbDownload.js`
 - [x] Add request timeouts and clearer network failure handling in `lib/distributer/mongodbDownload.js`
 - [x] Reject oversized downloads using `content-length` when available in `lib/distributer/mongodbDownload.js`

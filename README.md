@@ -54,6 +54,21 @@ nems.extract('/path/to/file.gz', '3.2.8', '.')
   });
 ```
 
+By default, newly downloaded archives are verified against the upstream `.sha256` file before extraction continues. If the MongoDB download host does not publish a checksum file for the requested archive, the download fails with a message that points to the low-level opt-out parameter `verify_checksum: false`.
+
+Advanced usage:
+```javascript
+import { createMongodbDownload } from 'nems/lib/distributer/mongodbDownload.js';
+
+const mongodbDownload = createMongodbDownload();
+
+mongodbDownload({
+  version: '3.2.8',
+  download_dir: '.',
+  verify_checksum: false
+});
+```
+
 #### Process
 Start a mongodb for the given file path.
 

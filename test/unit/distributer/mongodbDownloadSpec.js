@@ -1,5 +1,6 @@
 import events from 'events';
 import path from 'path';
+import crypto from 'crypto';
 
 import { createMongodbDownload } from '../../../lib/distributer/mongodbDownload.js';
 
@@ -30,6 +31,20 @@ function createRequestMock() {
   };
 
   return request;
+}
+
+function createReadStreamMock(chunks) {
+  const stream = new events.EventEmitter();
+  const resolvedChunks = chunks || [];
+
+  setImmediate(function () {
+    resolvedChunks.forEach(function (chunk) {
+      stream.emit('data', chunk);
+    });
+    stream.emit('end');
+  });
+
+  return stream;
 }
 
 function createResponseMock(statusCode, headers) {
@@ -74,7 +89,8 @@ describe('mongodbDownload', function () {
         unlink: jasmine.createSpy('fs.promises.unlink').and.returnValue(Promise.resolve()),
         rename: jasmine.createSpy('fs.promises.rename').and.returnValue(Promise.resolve())
       },
-      createWriteStream: jasmine.createSpy('fs.createWriteStream')
+      createWriteStream: jasmine.createSpy('fs.createWriteStream'),
+      createReadStream: jasmine.createSpy('fs.createReadStream')
     };
 
     httpsMock = {
@@ -519,6 +535,182 @@ describe('mongodbDownload', function () {
       })).toEqual(expectedFile);
 
       expect(httpsMock.get).not.toHaveBeenCalled();
+    });
+
+    it('should download and verify the sha256 checksum for newly downloaded files', async function () {
+      const downloadFile = createFileStreamMock();
+      const downloadRequest = createRequestMock();
+      const checksumRequest = createRequestMock();
+      const downloadResponse = createResponseMock(200, {
+        'content-length': '3'
+      });
+      const checksumResponse = new events.EventEmitter();
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-win32-x86_64-3.2.8.zip');
+      const fileContent = Buffer.from('abc');
+      const expectedHash = crypto.createHash('sha256').update(fileContent).digest('hex');
+
+      checksumResponse.statusCode = 200;
+      checksumResponse.headers = {
+        'content-length': String(expectedHash.length)
+      };
+
+      fsMock.createWriteStream.and.returnValue(downloadFile);
+      fsMock.createReadStream.and.callFake(function () {
+        return createReadStreamMock([fileContent]);
+      });
+      httpsMock.get.and.callFake(function (options, callback) {
+        if (String(options.path).endsWith('.sha256')) {
+          callback(checksumResponse);
+          setImmediate(function () {
+            checksumResponse.emit('data', Buffer.from(expectedHash + '  file.zip\n'));
+            checksumResponse.emit('end');
+          });
+          return checksumRequest;
+        }
+
+        callback(downloadResponse);
+        return downloadRequest;
+      });
+
+      const promise = underTest({
+        version: '3.2.8',
+        platform: 'win32',
+        arch: 'x64',
+        download_dir: '/tmp/downloads'
+      });
+
+      await flushPromises();
+      downloadFile.emit('finish');
+      await flushPromises();
+
+      expect(await promise).toEqual(expectedFile);
+      expect(fsMock.createReadStream).toHaveBeenCalledWith(expectedFile);
+    });
+
+    it('should delete the downloaded file when checksum verification fails', async function () {
+      const downloadFile = createFileStreamMock();
+      const downloadRequest = createRequestMock();
+      const checksumRequest = createRequestMock();
+      const downloadResponse = createResponseMock(200, {
+        'content-length': '3'
+      });
+      const checksumResponse = new events.EventEmitter();
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-win32-x86_64-3.2.8.zip');
+      const fileContent = Buffer.from('abc');
+      const unexpectedHash = crypto.createHash('sha256').update(Buffer.from('def')).digest('hex');
+
+      checksumResponse.statusCode = 200;
+      checksumResponse.headers = {
+        'content-length': String(unexpectedHash.length)
+      };
+
+      fsMock.createWriteStream.and.returnValue(downloadFile);
+      fsMock.createReadStream.and.callFake(function () {
+        return createReadStreamMock([fileContent]);
+      });
+      httpsMock.get.and.callFake(function (options, callback) {
+        if (String(options.path).endsWith('.sha256')) {
+          callback(checksumResponse);
+          setImmediate(function () {
+            checksumResponse.emit('data', Buffer.from(unexpectedHash + '  file.zip\n'));
+            checksumResponse.emit('end');
+          });
+          return checksumRequest;
+        }
+
+        callback(downloadResponse);
+        return downloadRequest;
+      });
+
+      try {
+        const promise = underTest({
+          version: '3.2.8',
+          platform: 'win32',
+          arch: 'x64',
+          download_dir: '/tmp/downloads'
+        });
+
+        await flushPromises();
+        downloadFile.emit('finish');
+        await flushPromises();
+
+        await promise;
+        throw new Error('Expected mongodbDownload to reject');
+      } catch (err) {
+        expect(err).toEqual(new Error('checksum mismatch for mongodb-win32-x86_64-3.2.8.zip'));
+        expect(fsMock.promises.unlink).toHaveBeenCalledWith(expectedFile);
+      }
+    });
+
+    it('should fail with an opt-out hint when the checksum file is missing', async function () {
+      const downloadFile = createFileStreamMock();
+      const downloadRequest = createRequestMock();
+      const checksumRequest = createRequestMock();
+      const downloadResponse = createResponseMock(200, {
+        'content-length': '3'
+      });
+      const checksumResponse = new events.EventEmitter();
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-win32-x86_64-3.2.8.zip');
+
+      checksumResponse.statusCode = 404;
+      checksumResponse.headers = {};
+
+      fsMock.createWriteStream.and.returnValue(downloadFile);
+      httpsMock.get.and.callFake(function (options, callback) {
+        if (String(options.path).endsWith('.sha256')) {
+          callback(checksumResponse);
+          return checksumRequest;
+        }
+
+        callback(downloadResponse);
+        return downloadRequest;
+      });
+
+      try {
+        const promise = underTest({
+          version: '3.2.8',
+          platform: 'win32',
+          arch: 'x64',
+          download_dir: '/tmp/downloads'
+        });
+
+        await flushPromises();
+        downloadFile.emit('finish');
+        await promise;
+        throw new Error('Expected mongodbDownload to reject');
+      } catch (err) {
+        expect(err).toEqual(new Error('checksum file is not available for this MongoDB archive; retry with verify_checksum: false to bypass checksum verification'));
+        expect(fsMock.promises.unlink).toHaveBeenCalledWith(expectedFile);
+      }
+    });
+
+    it('should skip checksum verification when verify_checksum is false', async function () {
+      const downloadFile = createFileStreamMock();
+      const downloadRequest = createRequestMock();
+      const downloadResponse = createResponseMock(200, {
+        'content-length': '3'
+      });
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-win32-x86_64-3.2.8.zip');
+
+      fsMock.createWriteStream.and.returnValue(downloadFile);
+      httpsMock.get.and.callFake(function (_options, callback) {
+        callback(downloadResponse);
+        return downloadRequest;
+      });
+
+      const promise = underTest({
+        version: '3.2.8',
+        platform: 'win32',
+        arch: 'x64',
+        download_dir: '/tmp/downloads',
+        verify_checksum: false
+      });
+
+      await flushPromises();
+      downloadFile.emit('finish');
+
+      expect(await promise).toEqual(expectedFile);
+      expect(httpsMock.get).toHaveBeenCalledTimes(1);
     });
   });
 });
