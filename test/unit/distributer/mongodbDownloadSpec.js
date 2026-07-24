@@ -280,6 +280,76 @@ describe('mongodbDownload', function () {
       }
     });
 
+    it('should reject when content-length exceeds the default limit', async function () {
+      const request = createRequestMock();
+      const response = createResponseMock(200, {
+        'content-length': String((1024 * 1024 * 1024) + 1)
+      });
+      const file = createFileStreamMock();
+
+      fsMock.createWriteStream.and.returnValue(file);
+      httpsMock.get.and.callFake(function (_options, callback) {
+        callback(response);
+        return request;
+      });
+
+      try {
+        await downloadToFile('https://fastdl.mongodb.org/linux/file.tgz', '/tmp/file.tgz.in_progress', '/tmp/file.tgz');
+        throw new Error('Expected downloadToFile to reject');
+      } catch (err) {
+        expect(err).toEqual(new Error('download failed: content-length 1073741825 exceeds limit 1073741824'));
+        expect(response.pipe).not.toHaveBeenCalled();
+        expect(fsMock.promises.unlink).toHaveBeenCalledWith('/tmp/file.tgz.in_progress');
+      }
+    });
+
+    it('should use a custom content-length limit from http options', async function () {
+      const request = createRequestMock();
+      const response = createResponseMock(200, {
+        'content-length': '12'
+      });
+      const file = createFileStreamMock();
+
+      fsMock.createWriteStream.and.returnValue(file);
+      httpsMock.get.and.callFake(function (_options, callback) {
+        callback(response);
+        return request;
+      });
+
+      try {
+        await downloadToFile(
+          'https://fastdl.mongodb.org/linux/file.tgz',
+          '/tmp/file.tgz.in_progress',
+          '/tmp/file.tgz',
+          { maxContentLength: 10 }
+        );
+        throw new Error('Expected downloadToFile to reject');
+      } catch (err) {
+        expect(err).toEqual(new Error('download failed: content-length 12 exceeds limit 10'));
+      }
+    });
+
+    it('should ignore invalid content-length headers', async function () {
+      const request = createRequestMock();
+      const response = createResponseMock(200, {
+        'content-length': 'not-a-number'
+      });
+      const file = createFileStreamMock();
+      let promise;
+
+      fsMock.createWriteStream.and.returnValue(file);
+      httpsMock.get.and.callFake(function (_options, callback) {
+        callback(response);
+        return request;
+      });
+
+      promise = downloadToFile('https://fastdl.mongodb.org/linux/file.tgz', '/tmp/file.tgz.in_progress', '/tmp/file.tgz');
+      file.emit('finish');
+
+      expect(await promise).toEqual('/tmp/file.tgz');
+      expect(response.pipe).toHaveBeenCalledWith(file);
+    });
+
     it('should remove the temp file when rename fails', async function () {
       const request = createRequestMock();
       const response = createResponseMock(200);
