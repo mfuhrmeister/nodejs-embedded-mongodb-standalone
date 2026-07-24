@@ -106,6 +106,7 @@ describe('mongoService', function () {
     childProcessMock.spawn.and.returnValue(spawnResult);
 
     fsMock = {
+      mkdirSync: jasmine.createSpy('fs.mkdirSync'),
       promises: {
         readFile: jasmine.createSpy('fs.promises.readFile').and.callFake(function () {
           return Promise.reject(createErrorWithCode('not found', 'ENOENT'));
@@ -199,6 +200,18 @@ describe('mongoService', function () {
           ]
         }
       ].forEach(testStartChildProcess);
+
+      it('should create the dbpath before spawning mongod', function (done) {
+        underTest.start(null, null, false, false, ANY_DB_PATH).then(function () {
+          expect(fsMock.mkdirSync).toHaveBeenCalledWith(ANY_DB_PATH, { recursive: true });
+          expect(childProcessMock.spawn).toHaveBeenCalled();
+          done();
+        }).catch(function () {
+          done.fail('dbpath creation before startup should have been resolved');
+        });
+
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
+      });
     });
 
     describe('mongo process', function () {
