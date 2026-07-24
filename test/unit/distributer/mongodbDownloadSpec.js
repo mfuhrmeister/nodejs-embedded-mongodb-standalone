@@ -403,22 +403,40 @@ describe('mongodbDownload', function () {
         });
       }
 
-      it('should resolve ubuntu 22 to the ubuntu1404 suffix', async function () {
+      it('should resolve ubuntu 22 and MongoDB 6 to the ubuntu2204 suffix', async function () {
         mockOsInfo(null, {
           dist: 'Ubuntu',
           release: '22.04'
         });
 
-        expect(await getLinuxDistroSuffix()).toEqual('-ubuntu1404');
+        expect(await getLinuxDistroSuffix('6.0.8')).toEqual('-ubuntu2204');
       });
 
-      it('should resolve elementary OS to the ubuntu1404 suffix', async function () {
+      it('should resolve ubuntu 20 and MongoDB 6 to the ubuntu2004 suffix', async function () {
+        mockOsInfo(null, {
+          dist: 'Ubuntu',
+          release: '20.04'
+        });
+
+        expect(await getLinuxDistroSuffix('6.0.8')).toEqual('-ubuntu2004');
+      });
+
+      it('should keep the legacy ubuntu1404 suffix for older MongoDB versions', async function () {
+        mockOsInfo(null, {
+          dist: 'Ubuntu',
+          release: '22.04'
+        });
+
+        expect(await getLinuxDistroSuffix('3.2.8')).toEqual('-ubuntu1404');
+      });
+
+      it('should resolve elementary OS to the modern Ubuntu suffix for MongoDB 6+', async function () {
         mockOsInfo(null, {
           dist: 'elementary OS',
           release: '7.1'
         });
 
-        expect(await getLinuxDistroSuffix()).toEqual('-ubuntu1404');
+        expect(await getLinuxDistroSuffix('6.0.8')).toEqual('-ubuntu2204');
       });
 
       it('should resolve fedora 20 to the rhel70 suffix', async function () {
@@ -427,7 +445,7 @@ describe('mongodbDownload', function () {
           release: '20'
         });
 
-        expect(await getLinuxDistroSuffix()).toEqual('-rhel70');
+        expect(await getLinuxDistroSuffix('6.0.8')).toEqual('-rhel70');
       });
 
       it('should reject when getos fails', async function () {
@@ -436,7 +454,7 @@ describe('mongodbDownload', function () {
         mockOsInfo(expectedError);
 
         try {
-          await getLinuxDistroSuffix();
+          await getLinuxDistroSuffix('6.0.8');
           throw new Error('Expected getLinuxDistroSuffix to reject');
         } catch (err) {
           expect(err).toBe(expectedError);
@@ -529,6 +547,27 @@ describe('mongodbDownload', function () {
 
       expect(await underTest({
         version: '3.2.8',
+        platform: 'linux',
+        arch: 'x64',
+        download_dir: '/tmp/downloads'
+      })).toEqual(expectedFile);
+
+      expect(httpsMock.get).not.toHaveBeenCalled();
+    });
+
+    it('should include the modern ubuntu distro suffix in the cached file path for MongoDB 6+', async function () {
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-linux-x86_64-ubuntu2204-6.0.8.tgz');
+
+      fsMock.promises.stat.and.returnValue(Promise.resolve({}));
+      getosMock.and.callFake(function (callback) {
+        callback(null, {
+          dist: 'Ubuntu',
+          release: '22.04'
+        });
+      });
+
+      expect(await underTest({
+        version: '6.0.8',
         platform: 'linux',
         arch: 'x64',
         download_dir: '/tmp/downloads'

@@ -54,6 +54,18 @@ function getFreePort() {
   });
 }
 
+function getSmokeVersion() {
+  if (process.env.NEMS_SMOKE_VERSION) {
+    return process.env.NEMS_SMOKE_VERSION;
+  }
+
+  if (process.platform === 'linux') {
+    return '6.0.8';
+  }
+
+  return DEFAULT_SMOKE_VERSION;
+}
+
 describeWhenEnabled('nems smoke', function () {
   let originalTimeout;
 
@@ -67,7 +79,7 @@ describeWhenEnabled('nems smoke', function () {
   });
 
   it('should download extract start and stop mongo with spaces in paths', async function () {
-    const version = process.env.NEMS_SMOKE_VERSION || DEFAULT_SMOKE_VERSION;
+    const version = getSmokeVersion();
     const baseDir = path.join(os.tmpdir(), 'nems smoke test');
     const downloadDir = path.join(baseDir, 'download dir');
     const dbPath = path.join(baseDir, 'db path');
