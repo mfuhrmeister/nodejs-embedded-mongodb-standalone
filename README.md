@@ -156,7 +156,8 @@ Within this module use:
  
 - **npm run stop** : `node bin/stop.js [binPath [dbpath]]` stops MongoDB for the given installation path and optional working directory.
  
- If no parameters are given, defaults (version 2.4.9 on most platforms, version 6.0.8 on macOS arm64, and the OS temp folder, respectively dbpath) are used.  
+ If no parameters are given, defaults (version 6.0.8, and the OS temp folder, respectively dbpath) are used.
+ Debug output is opt-in. Set `DEBUG=*` before running `npm start` or `npm run dax` if you want verbose downloader logs.
  Use only the 'h' flag to see further usage information.  
  *HINT: use double-minus to pass parameters to npm run command, e.g `npm start -- version`*
 

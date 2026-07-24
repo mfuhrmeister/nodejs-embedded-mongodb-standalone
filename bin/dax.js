@@ -1,9 +1,6 @@
 /** DAX - Download and extract mongodb with given version and extraction directory or defaults **/
 
-// toogle debug output for mongodb-download
-process.env.DEBUG = '*';
-
-import os from 'os';
+import { getCliErrorMessage, getDefaultVersion } from './cliCommon.js';
 import logger from '../lib/logger.js';
 import nems from '../lib/nems.js';
 
@@ -15,18 +12,11 @@ const
     'version - the version of the mongodb\n' +
     'dir - the directory to download and extract to\n\n' +
     'If no download directory is given, mongodb will be downloaded and extracted to the temporary folder of your OS.\n' +
-    'If no version is given also, a default version will be downloaded and extracted.',
+    'If no version is given also, the default version 6.0.8 will be downloaded and extracted.\n' +
+    'Set DEBUG=* before running to enable debug output.',
   MESSAGE_DEFAULTS = 'Using default configuration for download and extraction.',
   MESSAGE_EXTRACTED = 'Extracted to',
   MESSAGE_SUCCESS = 'Download and extraction completed.';
-
-function getDefaultVersion() {
-  if (os.platform() === 'darwin' && os.arch() === 'arm64') {
-    return '6.0.8';
-  }
-
-  return '2.4.9';
-}
 
 if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
   logger.info(MODULE_NAME, MESSAGE_USAGE);
@@ -47,7 +37,8 @@ if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-
       logger.info(MODULE_NAME, `${MESSAGE_EXTRACTED} ${extractedPath} .`);
       logger.info(MODULE_NAME, MESSAGE_SUCCESS);
     } catch (err) {
-      logger.error(MODULE_NAME, err);
+      logger.error(MODULE_NAME, getCliErrorMessage(err));
+      process.exitCode = 1;
     }
   }
 

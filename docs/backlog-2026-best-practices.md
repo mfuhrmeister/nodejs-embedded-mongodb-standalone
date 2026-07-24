@@ -26,12 +26,12 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 
 ## Priority 3: Safe Defaults
 
-- [ ] Remove MongoDB `2.4.9` as the default version for non-macOS-arm64 CLI flows in `bin/start.js` and `bin/dax.js`
-- [ ] Decide whether the default version should be a supported MongoDB LTS or whether version input should become mandatory
-- [ ] Centralize default version logic in a shared helper instead of duplicating it in `bin/start.js` and `bin/dax.js`
-- [ ] Make debug logging opt-in instead of forcing `process.env.DEBUG = '*'` in `bin/start.js` and `bin/dax.js`
-- [ ] Normalize CLI error output so all entrypoints log consistently and predictably across `bin/start.js`, `bin/dax.js`, and `bin/stop.js`
-- [ ] Update `README.md` after any default-version or CLI-behavior change
+- [x] Remove MongoDB `2.4.9` as the default version for non-macOS-arm64 CLI flows in `bin/start.js` and `bin/dax.js`
+- [x] Decide whether the default version should be a supported MongoDB LTS or whether version input should become mandatory
+- [x] Centralize default version logic in a shared helper instead of duplicating it in `bin/start.js` and `bin/dax.js`
+- [x] Make debug logging opt-in instead of forcing `process.env.DEBUG = '*'` in `bin/start.js` and `bin/dax.js`
+- [x] Normalize CLI error output so all entrypoints log consistently and predictably across `bin/start.js`, `bin/dax.js`, and `bin/stop.js`
+- [x] Update `README.md` after any default-version or CLI-behavior change
 
 ## Priority 4: Test And CI Confidence
 

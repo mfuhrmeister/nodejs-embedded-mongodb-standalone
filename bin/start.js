@@ -1,9 +1,6 @@
 /** Download, extract & start a mongodb with given version and extraction directory or defaults **/
 
-// toogle debug output for mongodb-download
-process.env.DEBUG = '*';
-
-import os from 'os';
+import { getCliErrorMessage, getDefaultVersion } from './cliCommon.js';
 import logger from '../lib/logger.js';
 import nems from '../lib/nems.js';
 
@@ -20,17 +17,10 @@ const
     'dbpath - db working directory, if different from installation path (optional)\n\n' +
     'DO NOT OMIT A PARAMETER IN SEQUENCE!\n' +
     'If no download directory is given, mongodb will be downloaded and extracted to the temporary folder of your OS.\n' +
-    'If no version is given also, a default version will be downloaded and extracted.',
+    'If no version is given also, the default version 6.0.8 will be downloaded and extracted.\n' +
+    'Set DEBUG=* before running to enable debug output.',
   MESSAGE_DEFAULTS = 'Using default configuration for download and extraction.',
   MESSAGE_STARTED = 'mongod started with pid';
-
-function getDefaultVersion() {
-  if (os.platform() === 'darwin' && os.arch() === 'arm64') {
-    return '6.0.8';
-  }
-
-  return '2.4.9';
-}
 
 if (args.length > 6 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
   logger.info(MODULE_NAME, MESSAGE_USAGE);
@@ -54,7 +44,8 @@ if (args.length > 6 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-
       const pid = await nems.start(VERSION, DOWNLOAD_DIR, PORT, NOPREALLOC, NOJOURNAL, DB_PATH);
       logger.info(MODULE_NAME, `${MESSAGE_STARTED} ${pid} .`);
     } catch (err) {
-      logger.error(MODULE_NAME, err.message);
+      logger.error(MODULE_NAME, getCliErrorMessage(err));
+      process.exitCode = 1;
     }
   }
 

@@ -1,5 +1,6 @@
 /** stops a mongodb with given db path **/
 
+import { getCliErrorMessage } from './cliCommon.js';
 import logger from '../lib/logger.js';
 import nems from '../lib/nems.js';
 
@@ -33,7 +34,8 @@ if (args.length > 2 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-
       await nems.stop(BINPATH, DBPATH);
       logger.info(MODULE_NAME, MESSAGE_STOPPED);
     } catch (err) {
-      logger.error(MODULE_NAME, err.message);
+      logger.error(MODULE_NAME, getCliErrorMessage(err));
+      process.exitCode = 1;
     }
   }
 
