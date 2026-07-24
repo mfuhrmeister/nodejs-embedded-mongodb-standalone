@@ -20,7 +20,7 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 - [x] Add request timeouts and clearer network failure handling in `lib/distributer/mongodbDownload.js`
 - [x] Reject oversized downloads using `content-length` when available in `lib/distributer/mongodbDownload.js`
 - [x] Remove partial `.in_progress` files on every failure path in `lib/distributer/mongodbDownload.js`
-- [ ] Add bounded extraction safeguards for zip archives in `lib/distributer/extractionService.js`
+- [x] Add bounded extraction safeguards for zip archives in `lib/distributer/extractionService.js`
 - [ ] Evaluate decompression ratio, total extracted size, and entry-count limits for both tar and zip flows in `lib/distributer/extractionService.js`
 - [ ] Add security-focused tests for malformed, oversized, or hostile archive inputs in `test/unit/distributer/extractionServiceSpec.js`
 

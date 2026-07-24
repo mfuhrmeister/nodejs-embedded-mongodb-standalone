@@ -14,6 +14,9 @@ const
   DEFAULT_EXTRACTION_DIR = 'mongodb-download',
   ERROR_MESSAGE_NO_FILE_FOR_EXTRACTION = 'missing file for extraction',
   ERROR_MESSAGE_NO_VERSION_FOR_EXTRACTION = 'missing version for extraction',
+  ERROR_MESSAGE_ZIP_ENTRY_LIMIT_EXCEEDED = 'zip extraction limits exceeded: too many entries',
+  ERROR_MESSAGE_ZIP_TOTAL_SIZE_LIMIT_EXCEEDED = 'zip extraction limits exceeded: total uncompressed size',
+  ERROR_MESSAGE_ZIP_COMPRESSION_RATIO_LIMIT_EXCEEDED = 'zip extraction limits exceeded: compression ratio',
   ERROR_MESSAGE_UNPROCESSABLE_ARCH_TYPE = 'invalid arch type';
 
 function createDecompressMock() {
@@ -80,7 +83,84 @@ describe('extractionService', function () {
 
       underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION).then(function () {
         expect(ensureDirMock).toHaveBeenCalledWith(path.resolve(expectedExtractionPath));
-        expect(extractZipMock).toHaveBeenCalledWith(ANY_VALID_FILE, { dir: path.resolve(expectedExtractionPath) });
+        expect(extractZipMock).toHaveBeenCalledWith(ANY_VALID_FILE, jasmine.objectContaining({
+          dir: path.resolve(expectedExtractionPath),
+          onEntry: jasmine.any(Function)
+        }));
+        done();
+      });
+    });
+
+    it('should reject when the zip entry count limit is exceeded', function (done) {
+      const expectedError = new Error(ERROR_MESSAGE_ZIP_ENTRY_LIMIT_EXCEEDED);
+      extractZipMock.and.callFake(function (_file, options) {
+        options.onEntry({ uncompressedSize: 1, compressedSize: 1 });
+        options.onEntry({ uncompressedSize: 1, compressedSize: 1 });
+        return Promise.resolve();
+      });
+
+      underTest = createExtractionService({
+        extractZip: extractZipMock,
+        tar: tarMock,
+        ensureDir: ensureDirMock,
+        zipLimits: { maxEntries: 1 }
+      });
+
+      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION).then(function () {
+        done.fail('Error should have been caught');
+      }).catch(function (err) {
+        expect(err.name).toEqual('ExtractionError');
+        expect(err.message).toEqual(expectedError.message);
+        expect(err.statusCode).toEqual(413);
+        done();
+      });
+    });
+
+    it('should reject when the total uncompressed zip size limit is exceeded', function (done) {
+      const expectedError = new Error(ERROR_MESSAGE_ZIP_TOTAL_SIZE_LIMIT_EXCEEDED);
+      extractZipMock.and.callFake(function (_file, options) {
+        options.onEntry({ uncompressedSize: 10, compressedSize: 10 });
+        options.onEntry({ uncompressedSize: 1, compressedSize: 1 });
+        return Promise.resolve();
+      });
+
+      underTest = createExtractionService({
+        extractZip: extractZipMock,
+        tar: tarMock,
+        ensureDir: ensureDirMock,
+        zipLimits: { maxTotalUncompressedBytes: 10 }
+      });
+
+      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION).then(function () {
+        done.fail('Error should have been caught');
+      }).catch(function (err) {
+        expect(err.name).toEqual('ExtractionError');
+        expect(err.message).toEqual(expectedError.message);
+        expect(err.statusCode).toEqual(413);
+        done();
+      });
+    });
+
+    it('should reject when the zip compression ratio limit is exceeded', function (done) {
+      const expectedError = new Error(ERROR_MESSAGE_ZIP_COMPRESSION_RATIO_LIMIT_EXCEEDED);
+      extractZipMock.and.callFake(function (_file, options) {
+        options.onEntry({ uncompressedSize: 10, compressedSize: 1 });
+        return Promise.resolve();
+      });
+
+      underTest = createExtractionService({
+        extractZip: extractZipMock,
+        tar: tarMock,
+        ensureDir: ensureDirMock,
+        zipLimits: { maxCompressionRatio: 2 }
+      });
+
+      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION).then(function () {
+        done.fail('Error should have been caught');
+      }).catch(function (err) {
+        expect(err.name).toEqual('ExtractionError');
+        expect(err.message).toEqual(expectedError.message);
+        expect(err.statusCode).toEqual(413);
         done();
       });
     });
