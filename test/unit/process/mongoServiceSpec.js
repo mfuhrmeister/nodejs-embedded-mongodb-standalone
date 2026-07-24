@@ -28,6 +28,8 @@ const
   MESSAGE_MONGO_INIT_EXCEPTION = '[initandlisten] exception in initAndListen',
   MESSAGE_MONGO_BAD_PORT = 'bad --port number',
   MESSAGE_MONGO_ADDR_IN_USE = 'addr already in use',
+  MESSAGE_MONGO_UNRECOGNISED_NOPREALLOC = 'Error parsing command line: unrecognised option \'--noprealloc\'',
+  MESSAGE_MONGO_UNRECOGNISED_NOJOURNAL = 'Error parsing command line: unrecognised option \'--nojournal\'',
   MESSAGE_MONGO_UNKNOWN_DB_PATH = 'There doesn\'t seem to be a server running with dbpath',
 
   SUCCESS_MESSAGE_MONGO_SHUTDOWN = 'The mongodb instance has been shutdown!',
@@ -77,6 +79,12 @@ function createTimersMock() {
       }
     }
   };
+}
+
+function flushPromises() {
+  return new Promise(function (resolve) {
+    setImmediate(resolve);
+  });
 }
 
 describe('mongoService', function () {
@@ -211,6 +219,32 @@ describe('mongoService', function () {
         });
 
         stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
+      });
+
+      it('should retry without noprealloc when mongod rejects the legacy flag', async function () {
+        const promise = underTest.start(null, null, true).then(function () {
+          expect(childProcessMock.spawn.calls.argsFor(0)).toEqual([MONGOD_COMMAND, [PARAMETER_NOPREALLOC]]);
+          expect(childProcessMock.spawn.calls.argsFor(1)).toEqual([MONGOD_COMMAND, []]);
+        });
+
+        stderrEventEmitter.emit('data', MESSAGE_MONGO_UNRECOGNISED_NOPREALLOC);
+        await flushPromises();
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
+
+        await promise;
+      });
+
+      it('should retry without nojournal when mongod rejects the legacy flag', async function () {
+        const promise = underTest.start(null, null, false, true).then(function () {
+          expect(childProcessMock.spawn.calls.argsFor(0)).toEqual([MONGOD_COMMAND, [PARAMETER_NOJOURNAL]]);
+          expect(childProcessMock.spawn.calls.argsFor(1)).toEqual([MONGOD_COMMAND, []]);
+        });
+
+        stderrEventEmitter.emit('data', MESSAGE_MONGO_UNRECOGNISED_NOJOURNAL);
+        await flushPromises();
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
+
+        await promise;
       });
     });
 
