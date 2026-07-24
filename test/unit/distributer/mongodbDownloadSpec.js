@@ -15,6 +15,23 @@ function createFileStreamMock() {
   return stream;
 }
 
+function createRequestMock() {
+  const request = new events.EventEmitter();
+  let timeoutCallback;
+
+  request.destroy = jasmine.createSpy('destroy');
+  request.setTimeout = jasmine.createSpy('setTimeout').and.callFake(function (_timeoutMs, callback) {
+    timeoutCallback = callback;
+  });
+  request.triggerTimeout = function () {
+    if (timeoutCallback) {
+      timeoutCallback();
+    }
+  };
+
+  return request;
+}
+
 function createResponseMock(statusCode, headers) {
   const response = new events.EventEmitter();
 
@@ -85,8 +102,8 @@ describe('mongodbDownload', function () {
     it('should follow redirects and resolve relative redirect locations', async function () {
       const firstFile = createFileStreamMock();
       const secondFile = createFileStreamMock();
-      const firstRequest = new events.EventEmitter();
-      const secondRequest = new events.EventEmitter();
+      const firstRequest = createRequestMock();
+      const secondRequest = createRequestMock();
       const firstResponse = createResponseMock(302, { location: '/redirected/file.tgz' });
       const secondResponse = createResponseMock(200);
       let promise;
@@ -129,10 +146,11 @@ describe('mongodbDownload', function () {
     });
 
     it('should reject when the download status is not 200', async function () {
-      const request = new events.EventEmitter();
+      const request = createRequestMock();
       const response = createResponseMock(500);
+      const file = createFileStreamMock();
 
-      fsMock.createWriteStream.and.returnValue(createFileStreamMock());
+      fsMock.createWriteStream.and.returnValue(file);
       httpsMock.get.and.callFake(function (_options, callback) {
         callback(response);
         return request;
@@ -143,15 +161,17 @@ describe('mongodbDownload', function () {
         throw new Error('Expected downloadToFile to reject');
       } catch (err) {
         expect(err).toEqual(new Error('download failed with status 500'));
+        expect(fsMock.promises.unlink).toHaveBeenCalledWith('/tmp/file.tgz.in_progress');
       }
     });
 
     it('should reject when the request emits an error', async function () {
-      const request = new events.EventEmitter();
+      const request = createRequestMock();
       const expectedError = new Error('network failure');
+      const file = createFileStreamMock();
       let promise;
 
-      fsMock.createWriteStream.and.returnValue(createFileStreamMock());
+      fsMock.createWriteStream.and.returnValue(file);
       httpsMock.get.and.returnValue(request);
 
       promise = downloadToFile('https://fastdl.mongodb.org/linux/file.tgz', '/tmp/file.tgz.in_progress', '/tmp/file.tgz');
@@ -162,11 +182,12 @@ describe('mongodbDownload', function () {
         throw new Error('Expected downloadToFile to reject');
       } catch (err) {
         expect(err).toBe(expectedError);
+        expect(fsMock.promises.unlink).toHaveBeenCalledWith('/tmp/file.tgz.in_progress');
       }
     });
 
     it('should reject when the response emits an error', async function () {
-      const request = new events.EventEmitter();
+      const request = createRequestMock();
       const response = createResponseMock(200);
       const file = createFileStreamMock();
       const expectedError = new Error('stream failure');
@@ -186,6 +207,102 @@ describe('mongodbDownload', function () {
         throw new Error('Expected downloadToFile to reject');
       } catch (err) {
         expect(err).toBe(expectedError);
+        expect(fsMock.promises.unlink).toHaveBeenCalledWith('/tmp/file.tgz.in_progress');
+      }
+    });
+
+    it('should reject when the redirect limit is exceeded', async function () {
+      const request = createRequestMock();
+      const response = createResponseMock(302, { location: '/redirected/file.tgz' });
+
+      fsMock.createWriteStream.and.returnValue(createFileStreamMock());
+      httpsMock.get.and.callFake(function (_options, callback) {
+        callback(response);
+        return request;
+      });
+
+      try {
+        await downloadToFile(
+          'https://fastdl.mongodb.org/linux/file.tgz',
+          '/tmp/file.tgz.in_progress',
+          '/tmp/file.tgz',
+          undefined,
+          { redirectCount: 0, maxRedirects: 0 }
+        );
+        throw new Error('Expected downloadToFile to reject');
+      } catch (err) {
+        expect(err).toEqual(new Error('download failed: too many redirects'));
+        expect(fsMock.promises.unlink).toHaveBeenCalledWith('/tmp/file.tgz.in_progress');
+      }
+    });
+
+    it('should reject when the request times out', async function () {
+      const request = createRequestMock();
+      let promise;
+
+      fsMock.createWriteStream.and.returnValue(createFileStreamMock());
+      httpsMock.get.and.returnValue(request);
+
+      promise = downloadToFile('https://fastdl.mongodb.org/linux/file.tgz', '/tmp/file.tgz.in_progress', '/tmp/file.tgz');
+      request.triggerTimeout();
+
+      try {
+        await promise;
+        throw new Error('Expected downloadToFile to reject');
+      } catch (err) {
+        expect(err).toEqual(new Error('download timed out after 30000ms'));
+        expect(request.destroy).toHaveBeenCalled();
+        expect(fsMock.promises.unlink).toHaveBeenCalledWith('/tmp/file.tgz.in_progress');
+      }
+    });
+
+    it('should use a custom timeout from http options', async function () {
+      const request = createRequestMock();
+      let promise;
+
+      fsMock.createWriteStream.and.returnValue(createFileStreamMock());
+      httpsMock.get.and.returnValue(request);
+
+      promise = downloadToFile(
+        'https://fastdl.mongodb.org/linux/file.tgz',
+        '/tmp/file.tgz.in_progress',
+        '/tmp/file.tgz',
+        { timeout: 1234 }
+      );
+      request.triggerTimeout();
+
+      try {
+        await promise;
+        throw new Error('Expected downloadToFile to reject');
+      } catch (err) {
+        expect(request.setTimeout).toHaveBeenCalledWith(1234, jasmine.any(Function));
+        expect(err).toEqual(new Error('download timed out after 1234ms'));
+      }
+    });
+
+    it('should remove the temp file when rename fails', async function () {
+      const request = createRequestMock();
+      const response = createResponseMock(200);
+      const file = createFileStreamMock();
+      const expectedError = new Error('rename failure');
+      let promise;
+
+      fsMock.promises.rename.and.returnValue(Promise.reject(expectedError));
+      fsMock.createWriteStream.and.returnValue(file);
+      httpsMock.get.and.callFake(function (_options, callback) {
+        callback(response);
+        return request;
+      });
+
+      promise = downloadToFile('https://fastdl.mongodb.org/linux/file.tgz', '/tmp/file.tgz.in_progress', '/tmp/file.tgz');
+      file.emit('finish');
+
+      try {
+        await promise;
+        throw new Error('Expected downloadToFile to reject');
+      } catch (err) {
+        expect(err).toBe(expectedError);
+        expect(fsMock.promises.unlink).toHaveBeenCalledWith('/tmp/file.tgz.in_progress');
       }
     });
   });
