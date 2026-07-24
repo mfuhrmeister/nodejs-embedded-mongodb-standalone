@@ -1,0 +1,3 @@
+- test (ci): add env-gated mongo smoke path
+- build (ci): use npm ci and add node matrix
+- fix (download): select supported Ubuntu archives for modern MongoDB
