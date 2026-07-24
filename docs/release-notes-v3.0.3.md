@@ -1,0 +1,3 @@
+- test (extractionService): add hostile archive coverage
+- fix (extractionService): add tar extraction limits
+- fix (extractionService): add zip extraction limits
