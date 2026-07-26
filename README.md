@@ -58,7 +58,7 @@ By default, newly downloaded archives are verified against the upstream `.sha256
 
 Advanced usage:
 ```javascript
-import { createMongodbDownload } from 'nems/lib/distributer/mongodbDownload.js';
+import { createMongodbDownload } from 'nems/lib/distributor/mongodbDownload.js';
 
 const mongodbDownload = createMongodbDownload();
 
@@ -150,7 +150,7 @@ import nems from 'nems';
 Supported public entrypoints:
 
 - `nems`
-- `nems/lib/distributer/mongodbDownload.js`
+- `nems/lib/distributor/mongodbDownload.js`
 
 Published package binaries:
 

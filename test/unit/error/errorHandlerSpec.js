@@ -46,4 +46,19 @@ describe('errorHandler', function () {
       expect(err).toBe(thrownError);
     }
   });
+
+  it('should not trust an arbitrary truthy predicate property', function () {
+    const thrownError = {
+      message: 'any error',
+      statusCode: 401,
+      predicate: true
+    };
+
+    try {
+      underTest.handleDownloadError(thrownError);
+    } catch (err) {
+      expect(err).toEqual(jasmine.any(DownloadError));
+      expect(err).not.toBe(thrownError);
+    }
+  });
 });

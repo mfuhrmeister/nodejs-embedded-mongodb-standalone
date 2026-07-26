@@ -1,7 +1,7 @@
 import os from 'os';
 import path from 'path';
 
-import { createExtractionService } from '../../../lib/distributer/extractionService.js';
+import { createExtractionService } from '../../../lib/distributor/extractionService.js';
 
 const
   ANY_VALID_FILE = 'ANY_VALID_FILE.zip',

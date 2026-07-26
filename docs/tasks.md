@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-- [x] Remove `ramda` by replacing the remaining usage in `lib/distributer/extractionService.js`
+- [x] Remove `ramda` by replacing the remaining usage in `lib/distributor/extractionService.js`
 - [x] Remove `fs-extra` from `test/testUtil.js` and switch to Node built-in `fs`
 - [x] Remove `sprintf-js` and replace formatting with template literals
 - [x] Replace deprecated `npmlog` with a minimal local logger and keep CLI output simple
@@ -25,8 +25,8 @@
 - [x] Keep Jasmine unless there is a strong reason to migrate the test runner separately
 - [x] Remove `rewire`-style testing from the unit suite before changing module format
 - [x] Refactor `lib/nems.js` to use explicit dependency seams instead of test-time module replacement
-- [x] Refactor `lib/distributer/extractionService.js` to expose testable seams without private module patching
-- [x] Refactor `lib/distributer/mongodbDownload.js` to expose pure helpers directly and inject I/O dependencies for download behavior
+- [x] Refactor `lib/distributor/extractionService.js` to expose testable seams without private module patching
+- [x] Refactor `lib/distributor/mongodbDownload.js` to expose pure helpers directly and inject I/O dependencies for download behavior
 - [x] Refactor `lib/process/mongoService.js` to use injected dependencies and instance-based state instead of patched module internals
 - [x] Update unit tests to stop using `rewire`, `__set__`, and `__get__`
 

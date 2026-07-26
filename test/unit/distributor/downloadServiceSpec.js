@@ -1,6 +1,6 @@
 import os from 'os';
 
-import { createDownloadService } from '../../../lib/distributer/downloadService.js';
+import { createDownloadService } from '../../../lib/distributor/downloadService.js';
 
 describe('downloadServiceSpec', function () {
 

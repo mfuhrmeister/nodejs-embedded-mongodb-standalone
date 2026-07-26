@@ -30,7 +30,7 @@
   },
   "exports": {
     ".": "./lib/nems.js",
-    "./lib/distributer/mongodbDownload.js": "./lib/distributer/mongodbDownload.js",
+    "./lib/distributor/mongodbDownload.js": "./lib/distributor/mongodbDownload.js",
     "./package.json": "./package.json"
   },
   "scripts": {
