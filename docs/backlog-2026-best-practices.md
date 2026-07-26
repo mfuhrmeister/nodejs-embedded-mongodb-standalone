@@ -42,13 +42,13 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 
 ## Priority 5: Package And Tooling Modernization
 
-- [ ] Add an `exports` map in `package.json` to define the supported public entrypoints explicitly
-- [ ] Decide whether the scripts in `bin/` should be published as package binaries via the `bin` field in `package.json`
-- [ ] Expand the lint script in `package.json` to include `bin/**/*.js`
-- [ ] Re-enable `no-unused-vars` in `eslint.config.cjs` with targeted ignore patterns instead of disabling it globally
-- [ ] Add `packageManager` metadata to `package.json`
-- [ ] Add `.nvmrc` or `.node-version` to make local toolchain selection less ambiguous
-- [ ] Add Renovate or Dependabot configuration for automated dependency maintenance
+- [x] Add an `exports` map in `package.json` to define the supported public entrypoints explicitly
+- [x] Expand the lint script in `package.json` to include `bin/**/*.js`
+- [x] Re-enable `no-unused-vars` in `eslint.config.cjs` with targeted ignore patterns instead of disabling it globally
+- [x] Add `packageManager` metadata to `package.json`
+- [x] Add `.nvmrc` or `.node-version` to make local toolchain selection less ambiguous
+- [x] Decide whether the scripts in `bin/` should be published as package binaries via the `bin` field in `package.json`
+- [x] Add Renovate or Dependabot configuration for automated dependency maintenance
 
 ## Priority 6: Code Maintainability
 

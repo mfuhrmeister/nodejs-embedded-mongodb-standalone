@@ -1,5 +1,5 @@
-var js = require('@eslint/js');
-var globals = require('globals');
+const js = require('@eslint/js');
+const globals = require('globals');
 
 module.exports = [
   js.configs.recommended,
@@ -28,7 +28,13 @@ module.exports = [
     },
     rules: {
       'no-extra-boolean-cast': 'off',
-      'no-unused-vars': 'off'
+      'no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
+        caughtErrors: 'all',
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+        ignoreRestSiblings: true
+      }]
     }
   }
 ];

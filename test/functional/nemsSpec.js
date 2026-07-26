@@ -104,7 +104,7 @@ describeWhenEnabled('nems smoke', function () {
       if (extractionPath && stopMessage !== SUCCESS_MESSAGE_MONGO_SHUTDOWN) {
         try {
           await nems.stop(path.join(extractionPath, 'bin'), dbPath);
-        } catch (err) {
+        } catch (_err) {
           // Best-effort cleanup so a failed smoke test does not leave mongod behind.
         }
       }

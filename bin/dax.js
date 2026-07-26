@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /** DAX - Download and extract mongodb with given version and extraction directory or defaults **/
 
 import { getCliErrorMessage, getDefaultVersion } from './cliCommon.js';

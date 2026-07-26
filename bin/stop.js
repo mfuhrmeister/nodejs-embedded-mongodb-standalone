@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /** stops a mongodb with given db path **/
 
 import { getCliErrorMessage } from './cliCommon.js';

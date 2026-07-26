@@ -147,6 +147,17 @@ This package now uses ESM:
 import nems from 'nems';
 ```
 
+Supported public entrypoints:
+
+- `nems`
+- `nems/lib/distributer/mongodbDownload.js`
+
+Published package binaries:
+
+- `npx nems [version [directory [port [noprealloc [nojournal [dbpath]]]]]]`
+- `npx nems-dax [version [directory]]`
+- `npx nems-stop [binPath [dbpath]]`
+
 
 ## Scripts
 Within this module use:
@@ -155,6 +166,8 @@ Within this module use:
 - **npm run dax** : `node bin/dax.js [version [directory]]` downloads and extracts MongoDB for the given version and download directory.
  
 - **npm run stop** : `node bin/stop.js [binPath [dbpath]]` stops MongoDB for the given installation path and optional working directory.
+
+If you install the package globally or run it through `npx`, the same entrypoints are available as `nems`, `nems-dax`, and `nems-stop`.
  
  If no parameters are given, defaults (version 6.0.8, and the OS temp folder, respectively dbpath) are used.
  Debug output is opt-in. Set `DEBUG=*` before running `npm start` or `npm run dax` if you want verbose downloader logs.
