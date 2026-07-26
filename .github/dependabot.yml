@@ -7,3 +7,10 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: build (deps)
+    ignore:
+      - dependency-name: eslint
+        update-types:
+          - version-update:semver-major
+      - dependency-name: "@eslint/js"
+        update-types:
+          - version-update:semver-major

@@ -49,3 +49,9 @@
 - [ ] Run targeted tests after each dependency removal
 - [ ] Run lint and diagnostics after each code change
 - [ ] Update `README.md` if user-facing behavior changes
+
+## Dependency Maintenance Notes
+
+- Dependabot major updates for `eslint` and `@eslint/js` are intentionally ignored for now.
+- Reason: ESLint 10 requires Node `^20.19.0 || ^22.13.0 || >=24`, while this package still supports Node `>=18`.
+- Revisit these major updates together when raising the Node baseline and modernizing the lint stack in one planned change.
