@@ -2,7 +2,7 @@ import events from 'events';
 import path from 'path';
 import crypto from 'crypto';
 
-import { createMongodbDownload } from '../../../lib/distributer/mongodbDownload.js';
+import { createMongodbDownload } from '../../../lib/distributor/mongodbDownload.js';
 
 function createFileStreamMock() {
   const stream = new events.EventEmitter();

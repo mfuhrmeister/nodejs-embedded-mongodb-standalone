@@ -15,14 +15,14 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 
 ## Priority 2: Download And Extraction Security
 
-- [x] Add checksum verification for downloaded MongoDB archives in `lib/distributer/mongodbDownload.js`
-- [x] Enforce a redirect limit in `lib/distributer/mongodbDownload.js`
-- [x] Add request timeouts and clearer network failure handling in `lib/distributer/mongodbDownload.js`
-- [x] Reject oversized downloads using `content-length` when available in `lib/distributer/mongodbDownload.js`
-- [x] Remove partial `.in_progress` files on every failure path in `lib/distributer/mongodbDownload.js`
-- [x] Add bounded extraction safeguards for zip archives in `lib/distributer/extractionService.js`
-- [x] Evaluate decompression ratio, total extracted size, and entry-count limits for both tar and zip flows in `lib/distributer/extractionService.js`
-- [x] Add security-focused tests for malformed, oversized, or hostile archive inputs in `test/unit/distributer/extractionServiceSpec.js`
+- [x] Add checksum verification for downloaded MongoDB archives in `lib/distributor/mongodbDownload.js`
+- [x] Enforce a redirect limit in `lib/distributor/mongodbDownload.js`
+- [x] Add request timeouts and clearer network failure handling in `lib/distributor/mongodbDownload.js`
+- [x] Reject oversized downloads using `content-length` when available in `lib/distributor/mongodbDownload.js`
+- [x] Remove partial `.in_progress` files on every failure path in `lib/distributor/mongodbDownload.js`
+- [x] Add bounded extraction safeguards for zip archives in `lib/distributor/extractionService.js`
+- [x] Evaluate decompression ratio, total extracted size, and entry-count limits for both tar and zip flows in `lib/distributor/extractionService.js`
+- [x] Add security-focused tests for malformed, oversized, or hostile archive inputs in `test/unit/distributor/extractionServiceSpec.js`
 
 ## Priority 3: Safe Defaults
 
@@ -52,12 +52,12 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 
 ## Priority 6: Code Maintainability
 
-- [ ] Rename `lib/distributer` to `lib/distributor` only if the compatibility impact is acceptable and imports can be updated safely
-- [ ] Simplify `errorHandler` so typed-error detection does not depend on a truthy `predicate` property in `lib/error/errorHandler.js`
-- [ ] Consider introducing stable error codes or stronger typed error checks in `lib/error/errors.js` and `lib/error/errorHandler.js`
-- [ ] Remove duplicated PID helper logic inside `lib/process/mongoService.js`
-- [ ] Replace the custom recursive directory helper with native recursive `mkdir` usage in `lib/distributer/extractionService.js`
-- [ ] Consider using `path.join(...)` instead of string concatenation for `bin` path creation in `lib/nems.js`
+- [x] Align the module directory name with `lib/distributor` before publishing the public entrypoint changes
+- [x] Simplify `errorHandler` so typed-error detection does not depend on a truthy `predicate` property in `lib/error/errorHandler.js`
+- [x] Consider introducing stable error codes or stronger typed error checks in `lib/error/errors.js` and `lib/error/errorHandler.js`
+- [x] Remove duplicated PID helper logic inside `lib/process/mongoService.js`
+- [x] Replace the custom recursive directory helper with native recursive `mkdir` usage in `lib/distributor/extractionService.js`
+- [x] Consider using `path.join(...)` instead of string concatenation for `bin` path creation in `lib/nems.js`
 
 ## Suggested Execution Order
 
@@ -73,6 +73,6 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 - For each Priority task list, create a separate branch.
 - Current `npm run build` passes, but the functional suite is still skipped, so build success does not yet prove operational end-to-end behavior.
 - Current `npm audit --omit=dev` reports zero production vulnerabilities, so the highest-value security work is runtime hardening rather than emergency dependency patching.
-- Keep changes incremental and testable; the highest-risk files are `lib/process/mongoService.js`, `lib/distributer/mongodbDownload.js`, and `lib/distributer/extractionService.js`.
+- Keep changes incremental and testable; the highest-risk files are `lib/process/mongoService.js`, `lib/distributor/mongodbDownload.js`, and `lib/distributor/extractionService.js`.
 - After finishing each Priority task list, evaluate what release type (patch/minor/major) is appropriate.
 - After finishing each Priority task list, give a command list for releasing on github and npmjs.org.

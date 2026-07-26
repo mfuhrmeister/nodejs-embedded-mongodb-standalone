@@ -1,3 +1,5 @@
+import path from 'path';
+
 import { createNems } from '../../lib/nems.js';
 
 describe('index', function () {
@@ -132,7 +134,7 @@ describe('index', function () {
     });
 
     it('should call all services and return the process id', function (done) {
-      const expectedBinPath = ANY_DOWNLOAD_DIR + '/bin';
+      const expectedBinPath = path.join(ANY_DOWNLOAD_DIR, 'bin');
 
       underTest.start(ANY_VERSION, ANY_DOWNLOAD_DIR, ANY_PORT, true, true, ANY_DB_PATH).then(function (pid) {
         expect(downloadServiceMock.download).toHaveBeenCalledWith(ANY_VERSION, ANY_DOWNLOAD_DIR);

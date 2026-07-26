@@ -1,0 +1,3 @@
+- chore (nems): remove obsolete stuff
+- build (pkg): modernize package metadata and tooling
+- refactor (core): rename distributor modules and finish maintainability cleanup

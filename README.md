@@ -15,7 +15,7 @@ CircleCI: ![Circle CI build status](https://circleci.com/gh/mfuhrmeister/nodejs-
 
 ## Features
 
-#### Distributer
+#### Distributor
 Downloads and extracts mongodb for a given version and download directory.
 The version is mandatory, the download directory may default to the OS temporary directory.
 
@@ -58,7 +58,7 @@ By default, newly downloaded archives are verified against the upstream `.sha256
 
 Advanced usage:
 ```javascript
-import { createMongodbDownload } from 'nems/lib/distributer/mongodbDownload.js';
+import { createMongodbDownload } from 'nems/lib/distributor/mongodbDownload.js';
 
 const mongodbDownload = createMongodbDownload();
 
@@ -150,7 +150,7 @@ import nems from 'nems';
 Supported public entrypoints:
 
 - `nems`
-- `nems/lib/distributer/mongodbDownload.js`
+- `nems/lib/distributor/mongodbDownload.js`
 
 Published package binaries:
 
