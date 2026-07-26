@@ -38,6 +38,7 @@ const
   ERROR_MESSAGE_MONGO_SHUTDOWN = 'could not create child process to stop mongo process',
   ERROR_MESSAGE_MONGO_START_TIMEOUT = 'could not start mongo process: startup timed out',
   ERROR_MESSAGE_MONGO_SHUTDOWN_TIMEOUT = 'could not stop mongo process: shutdown timed out',
+  ERROR_MESSAGE_MONGO_SHUTDOWN_PID_REQUIRED = 'could not stop mongo process: no pid is available and non-Linux shutdown requires the pid file written at startup',
   ERROR_MESSAGE_MONGO_INSTANCE_EXIST = 'Is a mongod instance already running?',
   ERROR_MESSAGE_MONGO_BAD_PORT = 'The port you used is not allowed. See mongodb docs.',
   ERROR_MESSAGE_MONGO_ADDR_IN_USE  = 'The port you used is already in use.',
@@ -96,9 +97,25 @@ describe('mongoService', function () {
     stderrEventEmitter,
     childProcessMock,
     fsMock,
+    platform,
     processMock,
     state,
     timersMock;
+
+  function createUnderTest() {
+    underTest = createMongoService({
+      childProcess: childProcessMock,
+      fs: fsMock,
+      process: processMock,
+      platform: platform,
+      state: state,
+      timers: timersMock,
+      timeouts: {
+        startupMs: 10,
+        shutdownMs: 20
+      }
+    });
+  }
 
   beforeEach(function () {
     stderrEventEmitter = new events.EventEmitter();
@@ -124,22 +141,13 @@ describe('mongoService', function () {
 
     processMock = jasmine.createSpyObj('process', ['kill']);
     timersMock = createTimersMock();
+    platform = 'linux';
 
     state = {
       mongoProcess: undefined
     };
 
-    underTest = createMongoService({
-      childProcess: childProcessMock,
-      fs: fsMock,
-      process: processMock,
-      state: state,
-      timers: timersMock,
-      timeouts: {
-        startupMs: 10,
-        shutdownMs: 20
-      }
-    });
+    createUnderTest();
   });
 
   it('should be defined', function () {
@@ -464,6 +472,21 @@ describe('mongoService', function () {
         });
       });
 
+      it('should stop using pid file on windows without a POSIX signal', function (done) {
+        platform = 'win32';
+        createUnderTest();
+        fsMock.promises.readFile.and.returnValue(Promise.resolve(String(ANY_PID)));
+
+        underTest.stop(ANY_BIN_PATH).then(function (message) {
+          expect(message).toEqual(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
+          expect(processMock.kill).toHaveBeenCalledWith(ANY_PID);
+          expect(childProcessMock.spawn).not.toHaveBeenCalled();
+          done();
+        }).catch(function () {
+          done.fail('windows pid-based shutdown should have been resolved');
+        });
+      });
+
       it('should fall back to mongod shutdown when pid file is missing', function (done) {
         underTest.stop(ANY_BIN_PATH).then(function (message) {
           expect(message).toEqual(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
@@ -480,6 +503,34 @@ describe('mongoService', function () {
 
         setImmediate(function () {
           stdoutEventEmitter.emit('data', MESSAGE_MONGO_KILLING_PROCESS);
+        });
+      });
+
+      it('should stop using managed process on macOS when pid file is missing', function (done) {
+        platform = 'darwin';
+        createUnderTest();
+
+        underTest.stop(ANY_BIN_PATH).then(function (message) {
+          expect(message).toEqual(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
+          expect(processMock.kill).toHaveBeenCalledWith(ANY_PID, 'SIGTERM');
+          expect(childProcessMock.spawn).not.toHaveBeenCalled();
+          done();
+        }).catch(function () {
+          done.fail('macOS managed-process shutdown should have been resolved');
+        });
+      });
+
+      it('should stop using managed process on windows when pid file is missing', function (done) {
+        platform = 'win32';
+        createUnderTest();
+
+        underTest.stop(ANY_BIN_PATH).then(function (message) {
+          expect(message).toEqual(SUCCESS_MESSAGE_MONGO_SHUTDOWN);
+          expect(processMock.kill).toHaveBeenCalledWith(ANY_PID);
+          expect(childProcessMock.spawn).not.toHaveBeenCalled();
+          done();
+        }).catch(function () {
+          done.fail('windows managed-process shutdown should have been resolved');
         });
       });
 
@@ -514,6 +565,20 @@ describe('mongoService', function () {
           done.fail('reject unknown dbPath when pid file points to a missing process should have been caught');
         }).catch(function (err) {
           expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_UNKNOWN_DB_PATH));
+          done();
+        });
+      });
+
+      it('should reject on non-linux when no pid is available', function (done) {
+        platform = 'darwin';
+        state.mongoProcess = undefined;
+        createUnderTest();
+
+        underTest.stop(ANY_BIN_PATH).then(function () {
+          done.fail('non-linux shutdown without pid should have been caught');
+        }).catch(function (err) {
+          expect(err).toEqual(new Error(ERROR_MESSAGE_MONGO_SHUTDOWN_PID_REQUIRED));
+          expect(childProcessMock.spawn).not.toHaveBeenCalled();
           done();
         });
       });

@@ -137,6 +137,8 @@ nems.stop('path/to/mongodb/installation','path/to/db/working/directory')
   });
 ```
 
+Shutdown behavior is platform-aware. If nems can resolve the `mongod` pid from the pid file written at startup, stop works across supported platforms. On Linux, nems also keeps `mongod --shutdown` as a fallback when no pid file is available. On macOS and Windows, pass the same `binPath` and `dbpath` used at startup so the pid file can be resolved reliably.
+
 ## Install
 
 `npm install nems`
@@ -166,6 +168,8 @@ Within this module use:
 - **npm run dax** : `node bin/dax.js [version [directory]]` downloads and extracts MongoDB for the given version and download directory.
  
 - **npm run stop** : `node bin/stop.js [binPath [dbpath]]` stops MongoDB for the given installation path and optional working directory.
+
+For macOS and Windows, prefer passing the same `binPath` and `dbpath` that were used at startup so `nems-stop` can resolve the pid file.
 
 If you install the package globally or run it through `npx`, the same entrypoints are available as `nems`, `nems-dax`, and `nems-stop`.
  
