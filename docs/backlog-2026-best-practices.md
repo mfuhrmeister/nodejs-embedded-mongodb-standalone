@@ -52,7 +52,7 @@ Improve maintainability, runtime hardening, performance, and release confidence 
 
 ## Priority 6: Code Maintainability
 
-- [x] Rename `lib/distributer` to `lib/distributor` now that the public entrypoint changes are still unreleased
+- [x] Align the module directory name with `lib/distributor` before publishing the public entrypoint changes
 - [x] Simplify `errorHandler` so typed-error detection does not depend on a truthy `predicate` property in `lib/error/errorHandler.js`
 - [x] Consider introducing stable error codes or stronger typed error checks in `lib/error/errors.js` and `lib/error/errorHandler.js`
 - [x] Remove duplicated PID helper logic inside `lib/process/mongoService.js`
