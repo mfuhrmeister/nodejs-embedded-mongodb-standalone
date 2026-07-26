@@ -61,7 +61,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "eslint": "^9.39.5",
-    "globals": "^16.4.0",
+    "globals": "^17.7.0",
     "jasmine": "^5.13.0",
     "jasmine-reporters": "^2.5.2"
   },
