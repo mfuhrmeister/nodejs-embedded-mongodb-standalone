@@ -1,0 +1,4 @@
+- build (deps): bump tar from 7.5.20 to 7.5.22
+- build (deps): bump globals from 16.5.0 to 17.7.0
+- build (deps): bump jasmine from 5.13.0 to 6.3.0
+- build (deps): ignore incompatible eslint major updates
