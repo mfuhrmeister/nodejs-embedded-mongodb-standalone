@@ -5,6 +5,7 @@ import { createMongoService } from '../../../lib/process/mongoService.js';
 
 const
   MONGOD_COMMAND = 'mongod',
+  MONGOD_COMMAND_WIN = 'mongod.exe',
   PARAMETER_DBPATH = '--dbpath',
   PARAMETER_PORT = '--port',
   PARAMETER_NOPREALLOC = '--noprealloc',
@@ -216,6 +217,28 @@ describe('mongoService', function () {
           ]
         }
       ].forEach(testStartChildProcess);
+
+      it('should use mongod.exe on windows when a bin path is provided', function (done) {
+        platform = 'win32';
+        createUnderTest();
+
+        underTest.start(ANY_BIN_PATH).then(function () {
+          expect(childProcessMock.spawn.calls.argsFor(0)).toEqual([
+            path.join(ANY_BIN_PATH, MONGOD_COMMAND_WIN),
+            [
+              PARAMETER_DBPATH,
+              ANY_BIN_PATH,
+              PARAMETER_PIDFILE,
+              ANY_PID_FILE_PATH
+            ]
+          ]);
+          done();
+        }).catch(function () {
+          done.fail('windows spawn should have been resolved');
+        });
+
+        stdoutEventEmitter.emit('data', MESSAGE_MONGO_WAITING);
+      });
 
       it('should create the dbpath before spawning mongod', function (done) {
         underTest.start(null, null, false, false, ANY_DB_PATH).then(function () {
