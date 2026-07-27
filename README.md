@@ -137,7 +137,7 @@ nems.stop('path/to/mongodb/installation','path/to/db/working/directory')
   });
 ```
 
-Shutdown behavior is platform-aware. If nems can resolve the `mongod` pid from the pid file written at startup, stop works across supported platforms. On Linux, nems also keeps `mongod --shutdown` as a fallback when no pid file is available. On macOS and Windows, pass the same `binPath` and `dbpath` used at startup so the pid file can be resolved reliably.
+Shutdown behavior is platform-aware. If nems can resolve the `mongod` pid from the pid file written at startup, stop works across supported platforms. On Linux, nems also keeps `mongod --shutdown` as a fallback when no pid file is available. On macOS and Windows, pass at least the same `binPath` used at startup so the pid file can be resolved reliably. If you started MongoDB with a custom `dbpath`, pass the same `dbpath` to `stop` as well.
 
 ## Install
 
@@ -169,11 +169,16 @@ Within this module use:
  
 - **npm run stop** : `node bin/stop.js [binPath [dbpath]]` stops MongoDB for the given installation path and optional working directory.
 
-For macOS and Windows, prefer passing the same `binPath` and `dbpath` that were used at startup so `nems-stop` can resolve the pid file.
+For macOS and Windows, do not rely on `npm run stop` without arguments in a separate shell. Pass at least the same `binPath` that was used at startup so `nems-stop` can resolve the pid file. If startup used a custom `dbpath`, pass that as the second argument too.
+
+Examples:
+
+- `npm run stop -- "C:\\path\\to\\mongodb\\bin"`
+- `npm run stop -- "C:\\path\\to\\mongodb\\bin" "C:\\path\\to\\db"`
 
 If you install the package globally or run it through `npx`, the same entrypoints are available as `nems`, `nems-dax`, and `nems-stop`.
  
- If no parameters are given, defaults (version 6.0.8, and the OS temp folder, respectively dbpath) are used.
+ If no parameters are given for `npm start` or `npm run dax`, defaults (version 6.0.8 and the OS temp folder) are used. `npm run stop` is different: on macOS and Windows you should pass at least `binPath`, and pass `dbpath` too when startup used a custom database directory.
  Debug output is opt-in. Set `DEBUG=*` before running `npm start` or `npm run dax` if you want verbose downloader logs.
  Use only the 'h' flag to see further usage information.  
  *HINT: use double-minus to pass parameters to npm run command, e.g `npm start -- version`*
