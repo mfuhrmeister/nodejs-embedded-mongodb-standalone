@@ -12,7 +12,8 @@ const
   MESSAGE_USAGE = 'Usage:\n\nnode ./bin/stop.js [binPath [dbpath]]\n\n' +
     'binPath - the mongo installation path\n\n' +
     'dbpath - db working directory, if different from installation path (optional)\n\n' +
-    'If no binPath is given, default path will be assumed.',
+    'If no binPath is given, default path will be assumed.\n\n' +
+    'On macOS and Windows, pass the same binPath and dbpath used at startup so nems can resolve the pid file.',
   MESSAGE_DEFAULTS = 'Using default configuration to stop mongodb.',
   MESSAGE_STOPPED = 'mongod stopped';
 

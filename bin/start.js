@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /** Download, extract & start a mongodb with given version and extraction directory or defaults **/
 
+import path from 'path';
+
 import { getCliErrorMessage, getDefaultVersion } from './cliCommon.js';
 import logger from '../lib/logger.js';
 import nems from '../lib/nems.js';
@@ -21,6 +23,8 @@ const
     'If no version is given also, the default version 6.0.8 will be downloaded and extracted.\n' +
     'Set DEBUG=* before running to enable debug output.',
   MESSAGE_DEFAULTS = 'Using default configuration for download and extraction.',
+  MESSAGE_BIN_PATH = 'Resolved binPath:',
+  MESSAGE_DB_PATH = 'Resolved dbPath:',
   MESSAGE_STARTED = 'mongod started with pid';
 
 if (args.length > 6 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-h' || args[0] === '--help'))) {
@@ -42,7 +46,14 @@ if (args.length > 6 || (args.length === 1 && ( args[0] === 'h' || args[0] === '-
 
   async function main() {
     try {
-      const pid = await nems.start(VERSION, DOWNLOAD_DIR, PORT, NOPREALLOC, NOJOURNAL, DB_PATH);
+      const extractionPath = await nems.distribute(VERSION, DOWNLOAD_DIR);
+      const binPath = path.join(extractionPath, 'bin');
+      const resolvedDbPath = DB_PATH || binPath;
+
+      logger.info(MODULE_NAME, `${MESSAGE_BIN_PATH} ${binPath}`);
+      logger.info(MODULE_NAME, `${MESSAGE_DB_PATH} ${resolvedDbPath}`);
+
+      const pid = await nems.startMongo(binPath, PORT, NOPREALLOC, NOJOURNAL, DB_PATH);
       logger.info(MODULE_NAME, `${MESSAGE_STARTED} ${pid} .`);
     } catch (err) {
       logger.error(MODULE_NAME, getCliErrorMessage(err));

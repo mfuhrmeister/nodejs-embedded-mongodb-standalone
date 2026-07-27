@@ -490,6 +490,21 @@ describe('mongodbDownload', function () {
       expect(httpsMock.get).not.toHaveBeenCalled();
     });
 
+    it('should use the modern windows archive name in the cached file path for MongoDB 6+', async function () {
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-windows-x86_64-6.0.8.zip');
+
+      fsMock.promises.stat.and.returnValue(Promise.resolve({}));
+
+      expect(await underTest({
+        version: '6.0.8',
+        platform: 'win32',
+        arch: 'x64',
+        download_dir: '/tmp/downloads'
+      })).toEqual(expectedFile);
+
+      expect(httpsMock.get).not.toHaveBeenCalled();
+    });
+
     it('should include the macOS arm64 archive name in the cached file path', async function () {
       const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-macos-arm64-6.0.8.tgz');
 
@@ -750,6 +765,57 @@ describe('mongodbDownload', function () {
 
       expect(await promise).toEqual(expectedFile);
       expect(httpsMock.get).toHaveBeenCalledTimes(1);
+    });
+
+    it('should request the modern windows download path for MongoDB 6+', async function () {
+      const downloadFile = createFileStreamMock();
+      const downloadRequest = createRequestMock();
+      const checksumRequest = createRequestMock();
+      const downloadResponse = createResponseMock(200, {
+        'content-length': '3'
+      });
+      const checksumResponse = new events.EventEmitter();
+      const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-windows-x86_64-6.0.8.zip');
+      const fileContent = Buffer.from('abc');
+      const expectedHash = crypto.createHash('sha256').update(fileContent).digest('hex');
+
+      checksumResponse.statusCode = 200;
+      checksumResponse.headers = {
+        'content-length': String(expectedHash.length)
+      };
+
+      fsMock.createWriteStream.and.returnValue(downloadFile);
+      fsMock.createReadStream.and.callFake(function () {
+        return createReadStreamMock([fileContent]);
+      });
+      httpsMock.get.and.callFake(function (options, callback) {
+        if (String(options.path).endsWith('.sha256')) {
+          expect(String(options.path)).toEqual('/windows/mongodb-windows-x86_64-6.0.8.zip.sha256');
+          callback(checksumResponse);
+          setImmediate(function () {
+            checksumResponse.emit('data', Buffer.from(expectedHash + '  file.zip\n'));
+            checksumResponse.emit('end');
+          });
+          return checksumRequest;
+        }
+
+        expect(String(options.path)).toEqual('/windows/mongodb-windows-x86_64-6.0.8.zip');
+        callback(downloadResponse);
+        return downloadRequest;
+      });
+
+      const promise = underTest({
+        version: '6.0.8',
+        platform: 'win32',
+        arch: 'x64',
+        download_dir: '/tmp/downloads'
+      });
+
+      await flushPromises();
+      downloadFile.emit('finish');
+      await flushPromises();
+
+      expect(await promise).toEqual(expectedFile);
     });
   });
 });
