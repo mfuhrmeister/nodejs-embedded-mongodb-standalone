@@ -31,18 +31,25 @@ describe('extractionService', function () {
     underTest,
     extractZipMock,
     tarMock,
-    ensureDirMock;
+    ensureDirMock,
+    fsMock;
 
   beforeEach(function () {
     extractZipMock = createDecompressMock();
     tarMock = {
       x: jasmine.createSpy('tar.x').and.returnValue(Promise.resolve())
     };
+    fsMock = {
+      promises: {
+        readdir: jasmine.createSpy('readdir').and.returnValue(Promise.resolve([]))
+      }
+    };
     ensureDirMock = jasmine.createSpy('ensureDir').and.returnValue(Promise.resolve());
 
     underTest = createExtractionService({
       extractZip: extractZipMock,
       tar: tarMock,
+      fs: fsMock,
       ensureDir: ensureDirMock
     });
   });
@@ -351,11 +358,49 @@ describe('extractionService', function () {
     });
 
     it('should resolve with extraction directory', function (done) {
-      const expectedExtractionPath = path.join(ANY_EXTRACTION_BASE_DIR, DEFAULT_EXTRACTION_DIR, ANY_VALID_VERSION);
+      const expectedExtractionPath = path.resolve(path.join(ANY_EXTRACTION_BASE_DIR, DEFAULT_EXTRACTION_DIR, ANY_VALID_VERSION));
 
       underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function (path) {
         expect(path).toEqual(expectedExtractionPath);
         done();
+      });
+    });
+
+    it('should resolve with the nested mongo root when a zip extracts into a single top-level folder', function (done) {
+      const expectedExtractionPath = path.resolve(path.join(ANY_EXTRACTION_BASE_DIR, DEFAULT_EXTRACTION_DIR, ANY_VALID_VERSION));
+      const nestedRoot = path.join(expectedExtractionPath, 'mongodb-windows-x86_64-6.0.8');
+
+      fsMock.promises.readdir.and.callFake(function (dir) {
+        if (dir === path.resolve(expectedExtractionPath)) {
+          return Promise.resolve([
+            {
+              name: 'mongodb-windows-x86_64-6.0.8',
+              isDirectory: function () {
+                return true;
+              }
+            }
+          ]);
+        }
+
+        if (dir === nestedRoot) {
+          return Promise.resolve([
+            {
+              name: 'bin',
+              isDirectory: function () {
+                return true;
+              }
+            }
+          ]);
+        }
+
+        return Promise.resolve([]);
+      });
+
+      underTest.extract(ANY_VALID_FILE, ANY_VALID_VERSION, ANY_EXTRACTION_BASE_DIR).then(function (result) {
+        expect(result).toEqual(nestedRoot);
+        done();
+      }).catch(function (err) {
+        done.fail(err);
       });
     });
   });
