@@ -169,6 +169,8 @@ Within this module use:
  
 - **npm run stop** : `node bin/stop.js [binPath [dbpath]]` stops MongoDB for the given installation path and optional working directory.
 
+`npm start` logs the resolved `binPath` and `dbPath` before `mongod` is launched. Reuse those exact values with `npm run stop`, especially on macOS and Windows.
+
 For macOS and Windows, do not rely on `npm run stop` without arguments in a separate shell. Pass at least the same `binPath` that was used at startup so `nems-stop` can resolve the pid file. If startup used a custom `dbpath`, pass that as the second argument too.
 
 Examples:
