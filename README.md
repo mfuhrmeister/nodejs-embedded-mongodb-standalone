@@ -23,7 +23,7 @@ The version is mandatory, the download directory may default to the OS temporary
 ```javascript
 import nems from 'nems';
 
-nems.distribute('3.2.8', '.')
+nems.distribute('6.0.8', '.')
   .then(function (path) {
     // do anything else with the 'path' to the extracted mongo directory
   })
@@ -37,7 +37,7 @@ You can use the download and extraction service separately:
 ```javascript
 import nems from 'nems';
 
-nems.download('3.2.8', '.')
+nems.download('6.0.8', '.')
   .then(function (file) {
     // do anything else with the 'file' string
   })
@@ -45,7 +45,7 @@ nems.download('3.2.8', '.')
     // catch any DownloadError or standard Error
   });
 
-nems.extract('/path/to/file.gz', '3.2.8', '.')
+nems.extract('/path/to/file.tgz', '6.0.8', '.')
   .then(function (path) {
     // do anything else with the 'path' to the extracted mongo directory
   })
@@ -63,7 +63,7 @@ import { createMongodbDownload } from 'nems/lib/distributor/mongodbDownload.js';
 const mongodbDownload = createMongodbDownload();
 
 mongodbDownload({
-  version: '3.2.8',
+  version: '6.0.8',
   download_dir: '.',
   verify_checksum: false
 });
@@ -115,7 +115,7 @@ import nems from 'nems';
  *  dbpath - db working directory, if different from installation path (optional)
  * 
  */
-nems.start('3.2.8', '.', 27017, true, true, 'path/to/db/working/directory')
+nems.start('6.0.8', '.', 27017, true, true, 'path/to/db/working/directory')
   .then(function (pid) {
     // do anything with the returned process id
   })
