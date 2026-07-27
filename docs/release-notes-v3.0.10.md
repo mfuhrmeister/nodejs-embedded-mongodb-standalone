@@ -1,0 +1,6 @@
+- fix (mongoService): add cross-platform shutdown behavior
+- fix (download): use modern Windows archive paths for MongoDB 6+
+- fix(mongoService): use correct mongod executable name for windows
+- fix (extract): normalize nested Windows archive root
+- docs (readme): clarify stop usage on macOS and Windows
+- feat (cli): log resolved runtime paths on startup
