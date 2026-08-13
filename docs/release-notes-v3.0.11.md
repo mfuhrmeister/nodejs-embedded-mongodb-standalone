@@ -1,0 +1,3 @@
+- fix (security): replace extract-zip with node-stream-zip to resolve unvalidated symlink path traversal (GHSA-jmr9-qjv8-65gv)
+- fix (security): add dependency overrides for js-yaml >=4.3.1 to resolve CVE-2026-59870 (GHSA-5p4m-2wfm-xmqj)
+- fix (security): add dependency overrides for brace-expansion >=1.1.18 to resolve CVE-2026-14257 (GHSA-mh99-v99m-4gvg, GHSA-rgw5-rvv9-x895)
