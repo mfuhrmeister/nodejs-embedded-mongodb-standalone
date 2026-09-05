@@ -77,7 +77,7 @@ Downloads write to `${tmpdir}/mongodb-download/${filename}.in_progress` before r
 | Run `npm audit` locally | ✅ Done | 0 vulnerabilities found |
 | Add version string validation | ✅ Done | Regex: `/^\d+\.\d+\.\d+$/` in `mongodbDownload.js` |
 | Consider GPG signature verification | ⚠️ Open | Architectural consideration |
-| Document security assumptions | ⚠️ Partial | README mentions checksums |
+| Document security assumptions | ✅ Done | Added Security section to README.md |
 
 ## Overall Assessment
 

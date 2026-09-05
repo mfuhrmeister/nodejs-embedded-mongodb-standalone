@@ -190,6 +190,34 @@ Within the source code project:
 
 - **npm test** : `npm run lint && npm run unit && npm run functional` runs eslint on source, test, and script files and runs all tests.
 
+## Security
+
+nems is designed for use in development, testing, and CI environments. Here are the security measures and assumptions:
+
+### Download Security
+
+- **SHA256 checksum verification** is enabled by default for all downloaded MongoDB archives. Downloads fail if the checksum file is unavailable or verification fails.
+- **Version validation**: The version parameter must be a semantic version string (e.g., `6.0.8`). Malformed versions are rejected to prevent URL injection.
+- **Download limits**: Redirects are limited to 5 hops, and downloads are bounded by size and timeout constraints.
+
+### Archive Extraction Security
+
+- **Path traversal protection**: All extracted paths are validated to stay within the target directory.
+- **Archive bomb protection**: Extraction limits include max entries (20,000), max uncompressed size (8GB), and max compression ratio (200x).
+- **Symlink filtering**: Symbolic links and hard links are filtered out during tar extraction.
+
+### Process Security
+
+- **Shell injection prevention**: `mongod` is spawned using argument arrays, not shell interpolation.
+- **Input sanitization**: While `spawn` usage is safe, consumers should avoid passing untrusted input to `version`, `binPath`, or `dbPath` parameters in production scenarios.
+
+### Known Limitations
+
+- Checksums are fetched from the same MongoDB download server (`fastdl.mongodb.org`) as the binaries. For additional assurance in high-security environments, consider pinning to known-good hashes or implementing GPG signature verification.
+- Temporary files are written to the OS temp directory without explicit permission restrictions. On shared systems, consider using a dedicated download directory.
+
+For details, see [docs/security-analysis.md](docs/security-analysis.md).
+
 ## Contributing
 
 Contributions welcome! Please submit all pull requests against master branch. If your pull request contains JavaScript patches or features, you should fully cover the code with unit tests. Thanks!
