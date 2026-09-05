@@ -32,7 +32,21 @@ The code downloads MongoDB binaries from `fastdl.mongodb.org` and verifies SHA25
 - Checksums are fetched from the same server as the binary (not a separate signing key infrastructure)
 - If an attacker compromised the MongoDB download server, they could replace both the binary and checksum
 
-**Recommendation**: Consider verifying GPG signatures if MongoDB provides them, or pin to specific known-good hashes.
+**Status**: Research completed on 2026-09-05.
+
+MongoDB provides GPG signatures for all releases:
+- Signature files available at `{download_url}.sig`
+- Version-specific public keys at `https://pgp.mongodb.com/server-{major}.{minor}.asc`
+- Example: MongoDB 8.0.9 uses `server-8.0.asc` key
+
+**Implementation recommendation**:
+- Use `openpgp` npm package (LGPL-3.0+, pure JavaScript, actively maintained)
+- Bundle known-good public keys for supported MongoDB versions (8.0, 7.0, 6.0, etc.)
+- Fetch keys from `pgp.mongodb.com` as fallback for newer versions
+- Add as additional verification layer alongside SHA256 (defense in depth)
+- Make opt-in via `verify_signature: 'gpg'` option initially
+
+See implementation details in `docs/tasks/gpg-verification-plan.md`.
 
 ### 3. Command Execution via `spawn`
 
