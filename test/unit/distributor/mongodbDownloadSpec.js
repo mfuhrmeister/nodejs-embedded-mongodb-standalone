@@ -474,6 +474,39 @@ describe('mongodbDownload', function () {
       }
     });
 
+    it('should reject if version format is invalid', async function () {
+      const invalidVersions = ['6.0', '6', 'v6.0.8', '6.0.8-rc0', '6.0.8.1', '../malicious'];
+
+      for (const version of invalidVersions) {
+        try {
+          await underTest({
+            platform: 'win32',
+            arch: 'x64',
+            version: version
+          });
+          throw new Error('Expected mongodbDownload to reject for version: ' + version);
+        } catch (err) {
+          expect(err.message).toEqual('invalid version format; expected semantic version (e.g., 6.0.8)');
+        }
+      }
+    });
+
+    it('should accept valid semantic version strings', async function () {
+      const validVersions = ['6.0.8', '7.0.0', '5.0.23', '4.4.29', '8.0.1'];
+
+      fsMock.promises.stat.and.returnValue(Promise.resolve({}));
+
+      for (const version of validVersions) {
+        const result = await underTest({
+          platform: 'win32',
+          arch: 'x64',
+          version: version,
+          download_dir: '/tmp/downloads'
+        });
+        expect(result).toContain(version);
+      }
+    });
+
     it('should return the cached file when it already exists', async function () {
       const expectedFile = path.resolve('/tmp/downloads', 'mongodb-download', 'mongodb-win32-x86_64-3.2.8.zip');
 

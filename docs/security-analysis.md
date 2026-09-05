@@ -48,17 +48,21 @@ The code properly uses `spawn` with an argument array (not shell interpolation),
 
 **Current risk**: Low - the `spawn` usage is safe from shell injection. But if this library were used in a context where untrusted input reaches `version`, `binPath`, or `dbPath` parameters, it could lead to unexpected behavior.
 
-### 4. No Input Validation for Version String
+### 4. ~~No Input Validation for Version String~~ ✅ RESOLVED
 
-In `mongodbDownload.js` (lines 556-567), the version string is used directly in URL construction:
+**Status**: Version validation added in `mongodbDownload.js` (lines 17-23).
+
+The version string is now validated against the regex `/^\d+\.\d+\.\d+$/` before URL construction. Invalid formats like `6.0`, `v6.0.8`, `../malicious`, or `6.0.8-rc0` are rejected with a clear error message.
+
 ```javascript
-const fileName = baseName + linuxSuffix + '-' + version + '.' + archiveExt;
-const downloadUrl = DOWNLOAD_BASE_URI + '/' + downloadPlatform + '/' + fileName;
+const VERSION_REGEX = /^\d+\.\d+\.\d+$/;
+
+function validateVersion(version) {
+  if (!VERSION_REGEX.test(version)) {
+    throw new Error(ERROR_MESSAGE_INVALID_VERSION);
+  }
+}
 ```
-
-A malicious version string could potentially construct unexpected URLs. While `baseName` is derived from platform/arch (not user input), the version is.
-
-**Recommendation**: Validate version format (e.g., `^\d+\.\d+\.\d+$`) before use.
 
 ### 5. Temporary File Handling
 
@@ -71,13 +75,12 @@ Downloads write to `${tmpdir}/mongodb-download/${filename}.in_progress` before r
 | Recommendation | Status | Notes |
 |----------------|--------|-------|
 | Run `npm audit` locally | ✅ Done | 0 vulnerabilities found |
-| Add version string validation | ⚠️ Open | Regex: `/^\d+\.\d+\.\d+$/` |
+| Add version string validation | ✅ Done | Regex: `/^\d+\.\d+\.\d+$/` in `mongodbDownload.js` |
 | Consider GPG signature verification | ⚠️ Open | Architectural consideration |
 | Document security assumptions | ⚠️ Partial | README mentions checksums |
 
 ## Overall Assessment
 
-The codebase demonstrates security-conscious design. The dependency audit concern is fully resolved. The main remaining items are:
-1. Version validation (simple fix)
-2. GPG verification (architectural consideration)
-3. Enhanced security documentation for library consumers
+The codebase demonstrates security-conscious design. Both the dependency audit and version validation concerns are now resolved. The main remaining items are:
+1. GPG verification (architectural consideration)
+2. Enhanced security documentation for library consumers

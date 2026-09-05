@@ -17,7 +17,8 @@ CircleCI: ![Circle CI build status](https://circleci.com/gh/mfuhrmeister/nodejs-
 
 #### Distributor
 Downloads and extracts mongodb for a given version and download directory.
-The version is mandatory, the download directory may default to the OS temporary directory.
+The version is mandatory and must be a semantic version string (e.g., `6.0.8`). Invalid formats are rejected with an error.
+The download directory may default to the OS temporary directory.
 
 ###### Usage:
 ```javascript
