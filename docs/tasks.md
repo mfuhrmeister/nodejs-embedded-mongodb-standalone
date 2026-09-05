@@ -1,6 +1,13 @@
 # Tasks
 
-## Current Focus
+Dependency Maintenance Notes:
+- Dependabot major updates for `eslint` and `@eslint/js` are intentionally ignored for now.
+- Reason: ESLint 10 requires Node `^20.19.0 || ^22.13.0 || >=24`, while this package still supports Node `>=18`.
+- Revisit these major updates together when raising the Node baseline and modernizing the lint stack in one planned change.
+
+## Done
+
+### Current Focus
 
 - [x] Remove `ramda` by replacing the remaining usage in `lib/distributor/extractionService.js`
 - [x] Remove `fs-extra` from `test/testUtil.js` and switch to Node built-in `fs`
@@ -9,7 +16,7 @@
 - [ ] Keep `getos` for now unless Linux distro detection is redesigned
 - [x] Replace Gulp-based `build` and `test` orchestration with npm and Node scripts
 
-## Modernization
+### Modernization
 
 - [x] Replace remaining `var` declarations with `const` and `let` where appropriate
 - [x] Simplify small helper functions with modern JavaScript syntax where it improves readability
@@ -17,9 +24,9 @@
 - [x] Evaluate whether Gulp can be replaced with plain npm scripts or small Node-based task runners
 - [x] Remove the remaining Gulp-specific files and dependency if they are no longer needed
 
-## ESM Migration Steps
+### ESM Migration Steps
 
-### Phase 1: Testing And Seams
+#### Phase 1: Testing And Seams
 
 - [x] Decide that package-wide ESM is worth the migration cost for the planned major release
 - [x] Keep Jasmine unless there is a strong reason to migrate the test runner separately
@@ -30,7 +37,7 @@
 - [x] Refactor `lib/process/mongoService.js` to use injected dependencies and instance-based state instead of patched module internals
 - [x] Update unit tests to stop using `rewire`, `__set__`, and `__get__`
 
-### Phase 2: Module Conversion
+#### Phase 2: Module Conversion
 
 - [x] Decide to use package-wide `"type": "module"` instead of a narrower `.mjs` migration strategy
 - [x] Convert `require(...)` and `module.exports` usage to `import` and `export`
@@ -38,20 +45,13 @@
 - [x] Update CLI entrypoints under `bin/` for ESM-compatible imports and execution
 - [x] Update helper scripts under `scripts/` for ESM-compatible path handling and imports
 
-### Phase 3: Verification And Docs
+#### Phase 3: Verification And Docs
 
 - [x] Re-run `npm test`, `npm run build`, `npm run dax`, `npm run start`, and `npm run stop` after the migration
 - [x] Update `README.md` and release notes if module system behavior changes for users
 
-## Process
+### Process
 
-- [ ] Keep each cleanup as a separate commit
-- [ ] Run targeted tests after each dependency removal
-- [ ] Run lint and diagnostics after each code change
+- [ ] Run lint and diagnostics after each completed task
 - [ ] Update `README.md` if user-facing behavior changes
-
-## Dependency Maintenance Notes
-
-- Dependabot major updates for `eslint` and `@eslint/js` are intentionally ignored for now.
-- Reason: ESLint 10 requires Node `^20.19.0 || ^22.13.0 || >=24`, while this package still supports Node `>=18`.
-- Revisit these major updates together when raising the Node baseline and modernizing the lint stack in one planned change.
+- [ ] Propose a git commit message after each completed task
