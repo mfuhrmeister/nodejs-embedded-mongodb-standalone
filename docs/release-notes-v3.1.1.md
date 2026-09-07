@@ -1,0 +1,4 @@
+- feat (security): add version string validation to prevent URL injection (e.g., 6.0.8)
+- feat (security): add GPG signature verification for MongoDB downloads with bundled public keys (4.4, 5.0, 6.0, 7.0, 8.0)
+- docs (security): add comprehensive Security section to README with security posture documentation
+- docs: add GPG verification implementation plan and status documentation
