@@ -57,6 +57,29 @@ nems.extract('/path/to/file.tgz', '6.0.8', '.')
 
 By default, newly downloaded archives are verified against the upstream `.sha256` file before extraction continues. If the MongoDB download host does not publish a checksum file for the requested archive, the download fails with a message that points to the low-level opt-out parameter `verify_checksum: false`.
 
+**GPG signature verification** is available as an additional security layer. When enabled, downloaded archives are verified against MongoDB's GPG signatures using bundled public keys for MongoDB versions 4.4, 5.0, 6.0, 7.0, and 8.0:
+
+```javascript
+import { createMongodbDownload } from 'nems/lib/distributor/mongodbDownload.js';
+
+const mongodbDownload = createMongodbDownload();
+
+// GPG signature verification only
+mongodbDownload({
+  version: '8.0.9',
+  download_dir: '.',
+  verify_checksum: false,
+  verify_signature: 'gpg'
+});
+
+// Both SHA256 checksum and GPG signature verification (recommended)
+mongodbDownload({
+  version: '8.0.9',
+  download_dir: '.',
+  verify_signature: 'both'
+});
+```
+
 Advanced usage:
 ```javascript
 import { createMongodbDownload } from 'nems/lib/distributor/mongodbDownload.js';

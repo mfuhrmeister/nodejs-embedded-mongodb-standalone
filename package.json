@@ -68,6 +68,7 @@
   "dependencies": {
     "getos": "^3.2.1",
     "node-stream-zip": "^1.16.0",
+    "openpgp": "^6.1.0",
     "tar": "^7.5.20"
   },
   "overrides": {

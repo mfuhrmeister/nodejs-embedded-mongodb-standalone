@@ -52,6 +52,6 @@ Dependency Maintenance Notes:
 
 ### Process
 
-- [ ] Run lint and diagnostics after each completed task
-- [ ] Update `README.md` if user-facing behavior changes
-- [ ] Propose a git commit message after each completed task
+- [x] Run lint and diagnostics after each completed task
+- [x] Update `README.md` if user-facing behavior changes
+- [x] Propose a git commit message after each completed task
