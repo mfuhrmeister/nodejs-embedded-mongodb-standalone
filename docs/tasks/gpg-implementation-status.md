@@ -1,7 +1,7 @@
 # GPG Verification Implementation Status
 
-**Date**: 2026-09-05
-**Status**: Implementation complete, testing in progress
+**Date**: 2026-09-30
+**Status**: Implementation complete, unit tests passing
 
 ## Completed Work
 
@@ -29,21 +29,16 @@
 ## Remaining Work
 
 ### Testing (Priority 1)
-- [ ] Fix async mocking in `gpgVerifySpec.js`
-  - Tests are timing out due to complex promise chains
-  - Need to properly mock `openpgp` module behavior
-  - Follow existing test patterns from `mongodbDownloadSpec.js`
-- [ ] Add integration test with real signature verification
-- [ ] Test error cases (missing key, invalid signature, 404 on .sig file)
+
 
 ### Documentation (Priority 2)
-- [ ] Update README.md with `verify_signature` option
-- [ ] Add examples of GPG verification usage
-- [ ] Document bundled key versions
-- [ ] Update security-analysis.md to mark GPG as implemented
+- [x] Update README.md with `verify_signature` option
+- [x] Add examples of GPG verification usage
+- [x] Document bundled key versions
+- [x] Update security-analysis.md to mark GPG as implemented
 
 ### Validation (Priority 3)
-- [ ] Run full test suite
+- [x] Run full test suite
 - [ ] Check lint
 - [ ] Test with real MongoDB download (opt-in smoke test)
 
@@ -90,26 +85,21 @@ mongodbDownload({ version: '8.0.9', verify_signature: 'both' })
 
 ## Next Steps
 
-1. **Fix tests** - Highest priority, blocks commit
-   - Study existing async test patterns
-   - Simplify mocking or use dependency injection
-   - Consider skipping GPG tests initially, add later
+1. **Optional Integration Tests**
+   - Add integration test with real signature verification against MongoDB releases
+   - Test error cases (missing key, invalid signature, 404 on .sig file)
+   - Optional: refactor `gpgVerify.js` for easier mocking if needed
 
-2. **Document** - Can proceed in parallel
-   - README updates
-   - Usage examples
+2. **Monitor & Gather Feedback**
+   - Gather feedback from early adopters on `verify_signature` usage
+   - Monitor for edge cases (missing .sig files, key rotation)
 
-3. **Commit strategy**:
-   - **Option A**: Commit with skipped/pending GPP tests, mark as WIP
-   - **Option B**: Fix tests first, commit complete feature
-   - **Option C**: Revert GPG work, commit version validation only
+3. **Future Considerations**
+   - Consider making `verify_signature: 'gpg'` the default in a future major version
+   - Document migration path for users who need to opt-out
 
-## Recommendation
+## Status Summary
 
-Given time constraints, recommend **Option A**: 
-- Mark GPG tests as pending with `xit()` or skip them
-- Document the implementation status
-- Commit as "feat(security): add GPG verification (tests pending)"
-- Fix tests in follow-up commit
+**Feature is shipped.** GPG verification was released in commit c5f497b (v3.1.0) with `verify_signature: false` as the default. Core implementation, documentation, and unit tests are complete.
 
-This allows the work to be saved while acknowledging the testing gap.
+No blockers remain. Remaining items are optional enhancements (integration tests, feedback monitoring, future default enablement).

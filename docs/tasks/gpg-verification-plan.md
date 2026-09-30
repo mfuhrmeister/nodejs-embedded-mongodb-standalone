@@ -154,24 +154,28 @@ Download archive → Download .sig file → Get public key → Verify signature 
 ### 8. Implementation Phases
 
 #### Phase 1: Core Implementation
-- [ ] Add `openpgp` dependency
-- [ ] Create `lib/keys/` with bundled public keys
-- [ ] Implement `lib/distributor/gpgVerify.js`
-- [ ] Add `SignatureError` error type
-- [ ] Integrate into `mongodbDownload.js`
-- [ ] Unit tests with test fixtures
+- [x] Add `openpgp` dependency
+- [x] Create `lib/keys/` with bundled public keys
+- [x] Implement `lib/distributor/gpgVerify.js`
+- [x] Add `SignatureError` error type
+- [x] Integrate into `mongodbDownload.js`
+- [x] Unit tests with test fixtures
 
 #### Phase 2: Testing & Documentation
-- [ ] Integration tests with real MongoDB releases
-- [ ] Update README.md with `verify_signature` option
-- [ ] Update security-analysis.md
+- [x] Update README.md with `verify_signature` option
+- [x] Update security-analysis.md
+
 
 #### Phase 3: Opt-in Rollout
-- [ ] Release with `verify_signature: false` default
-- [ ] Gather feedback from early adopters
-- [ ] Monitor for edge cases (missing .sig files, key rotation)
+- [x] Release with `verify_signature: false` default
 
-#### Phase 4: Default Enable (Future Major Version)
+
+#### Phase 4: Optional Considertions
+- [ ] Integration tests with real MongoDB releases
+- [ ] Gather feedback from early adopters
+- [ ] Monitor for edge cases (missing .sig files, key rotation) 
+- [ ] Add integration test with real signature verification
+- [ ] Test error cases (missing key, invalid signature, 404 on .sig file)
 - [ ] Consider making `verify_signature: 'gpg'` the default
 - [ ] Document migration path for users who need to opt-out
 
