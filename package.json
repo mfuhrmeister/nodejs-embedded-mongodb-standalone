@@ -73,7 +73,7 @@
   },
   "overrides": {
     "async": "^2.6.4",
-    "brace-expansion": "^1.1.18",
+    "brace-expansion": "^1.1.21",
     "graceful-fs": "^4.2.11",
     "js-yaml": "^4.3.2",
     "lodash": "^4.18.1",
