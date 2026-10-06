@@ -4,7 +4,7 @@
 
 nems is a native Promise-based embedded MongoDB distribution library that downloads an appropriate MongoDB build and runs it standalone, for example in integration and functional tests.
 
-Requires Node.js 18 or newer.
+Requires Node.js 20 or newer.
 
 ![nodei.co](https://nodei.co/npm/nems.png?downloads=true&downloadRank=true&stars=true)
 
