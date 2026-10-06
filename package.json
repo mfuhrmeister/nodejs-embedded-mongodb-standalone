@@ -62,11 +62,12 @@
     "@eslint/js": "^9.39.1",
     "eslint": "^9.39.5",
     "globals": "^17.7.0",
-    "jasmine": "^6.3.0",
+    "jasmine": "^7.0.0",
     "jasmine-reporters": "^2.5.2"
   },
   "dependencies": {
     "getos": "^3.2.1",
+    "jasmine-reporters": "^2.5.2",
     "node-stream-zip": "^1.16.0",
     "openpgp": "^6.1.0",
     "tar": "^7.5.20"

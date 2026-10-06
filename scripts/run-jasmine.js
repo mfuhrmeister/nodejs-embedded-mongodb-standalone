@@ -1,16 +1,16 @@
 import path from 'path';
 import Jasmine from 'jasmine';
-import jasmineReporters from 'jasmine-reporters';
+import JasmineReporters from 'jasmine-reporters';
 
 function createTerminalReporter() {
-  return new jasmineReporters.TerminalReporter({
+  return new JasmineReporters.TerminalReporter({
     verbosity: 3,
     color: 'yellow'
   });
 }
 
 function createJunitReporter(reportDir) {
-  return new jasmineReporters.JUnitXmlReporter({
+  return new JasmineReporters.JUnitXmlReporter({
     consolidate: true,
     consolidateAll: false,
     savePath: reportDir,
