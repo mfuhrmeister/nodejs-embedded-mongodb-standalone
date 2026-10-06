@@ -1,0 +1,1 @@
+- docs: update README to reflect Node.js 20 requirement
