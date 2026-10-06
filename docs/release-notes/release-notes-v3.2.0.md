@@ -1,0 +1,3 @@
+- build: upgrade Node engine requirement from >=18 to >=20
+- build: upgrade ESLint from v9.39.5 to v10.12.0
+- fix: preserve error cause chain in gpgVerify and mongodbDownload error handling
